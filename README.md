@@ -30,3 +30,4 @@ Everything meant to change is isolated so you don't have to touch the layout:
 Cream background, deep forest green accent, muted moss highlights, warm charcoal
 text — serif headings (Georgia) paired with a system sans for body.
 # modguard-site-page
+# modguard-site-page
