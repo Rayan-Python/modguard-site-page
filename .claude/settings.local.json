@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(curl -s http://localhost:5173/src/pages/Home.jsx)",
+      "Bash(curl -s http://localhost:5173/src/pages/Team.jsx)",
+      "Bash(curl -s http://localhost:5173/src/styles.css)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(npm run *)",
+      "Bash(npx --version)",
+      "Bash(disown)",
+      "Bash(curl -sv http://localhost:5173/ -o /dev/null -w \"\\\\nHTTP_CODE:%{http_code} TIME:%{time_total}s\\\\n\" --max-time 8)",
+      "Bash(kill 50880)",
+      "Bash(kill -9 50880)",
+      "Bash(echo \"started pid $!\")",
+      "Bash(curl -s --max-time 5 http://localhost:5173/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" --max-time 5 http://localhost:5173/)",
+      "Bash(kill -9 50961)",
+      "Bash(kill -9 50978)",
+      "Bash(curl -s -o /dev/null -w \"check1: %{http_code}\\\\n\" --max-time 5 http://localhost:5173/)",
+      "Bash(curl -s -o /dev/null -w \"check2 \\(separate call, +5s later\\): %{http_code}\\\\n\" --max-time 5 http://localhost:5173/)",
+      "Bash(pkill -f \"vite --port 5173\")",
+      "Bash(curl -s -o /dev/null -w \"check1: %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/)",
+      "Bash(curl -s -o /dev/null -w \"check2 \\(+6s, new call\\): %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/)",
+      "Bash(curl -s -w \"check3 \\(+10s\\): %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/)",
+      "Bash(pkill -f \"http.server 5174\")",
+      "Bash(curl -s -o /dev/null -w \"check2 \\(+6s\\): %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/)",
+      "Skill(claude-in-chrome)",
+      "Bash(nohup python3 -m http.server 5174 --bind 127.0.0.1)",
+      "Bash(curl -s -o /dev/null -w \"check: %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/)"
+    ]
+  }
+}
