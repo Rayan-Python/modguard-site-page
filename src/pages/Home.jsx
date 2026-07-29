@@ -11,7 +11,7 @@ export default function Home() {
           <div className="hero__actions">
             <a
               className="btn btn--primary"
-              href="https://github.com/Rayan-Python/modguard-site-page/releases/download/v1.0.0/ModGuard-1.0.0-universal.dmg"
+              href="https://github.com/Rayan-Python/modguard-site-page/releases/download/v1.4.0/ModGuard-1.4.0-universal.dmg"
             >
               <svg
                 className="btn__icon"
