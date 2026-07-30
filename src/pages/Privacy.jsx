@@ -1,6 +1,6 @@
 export default function Privacy() {
   return (
-    <section className="doc">
+    <section className="doc doc--panel">
       <div className="container doc__inner">
         <h1 className="doc__title">Privacy</h1>
 

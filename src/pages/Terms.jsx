@@ -2,7 +2,7 @@ import { SUPPORT_EMAIL } from '../data/contact.js'
 
 export default function Terms() {
   return (
-    <section className="doc">
+    <section className="doc doc--panel">
       <div className="container doc__inner">
         <h1 className="doc__title">Terms &amp; Conditions</h1>
 

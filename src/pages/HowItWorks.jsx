@@ -18,7 +18,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="doc">
+    <section className="doc doc--panel">
       <div className="container doc__inner">
         <h1 className="doc__title">How it works</h1>
         <p className="doc__lede">
