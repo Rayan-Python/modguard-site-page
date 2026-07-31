@@ -9,6 +9,7 @@ import HowItWorks from './pages/HowItWorks.jsx'
 import Version from './pages/Version.jsx'
 import Terms from './pages/Terms.jsx'
 import Security from './pages/Security.jsx'
+import WhyFree from './pages/WhyFree.jsx'
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/version" element={<Version />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/security" element={<Security />} />
+          <Route path="/free" element={<WhyFree />} />
         </Routes>
       </main>
       <Footer />

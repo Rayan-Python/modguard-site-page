@@ -1,8 +1,16 @@
+// Newest release first. Add new entries at the top of this array as they ship.
 const entries = [
   {
-    version: 'v0.1',
-    date: 'Unreleased',
-    notes: ['First build of ModGuard for Mac.'],
+    version: 'v1.4.0',
+    date: null,
+    current: true,
+    changes: ['Improved detection accuracy'],
+  },
+  {
+    version: 'v1.0.0',
+    date: null,
+    current: false,
+    changes: ['Initial release'],
   },
 ]
 
@@ -17,11 +25,16 @@ export default function Version() {
             <li className="doc__entry" key={entry.version}>
               <div className="doc__entry-head">
                 <span className="doc__entry-version">{entry.version}</span>
-                <span className="doc__entry-date">{entry.date}</span>
+                {entry.current && (
+                  <span className="doc__entry-badge">Current</span>
+                )}
+                {entry.date && (
+                  <span className="doc__entry-date">{entry.date}</span>
+                )}
               </div>
               <ul className="doc__entry-notes">
-                {entry.notes.map((note) => (
-                  <li key={note}>{note}</li>
+                {entry.changes.map((change) => (
+                  <li key={change}>{change}</li>
                 ))}
               </ul>
             </li>

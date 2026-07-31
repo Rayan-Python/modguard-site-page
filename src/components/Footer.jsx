@@ -13,6 +13,9 @@ export default function Footer() {
           </div>
 
           <nav className="footer__links" aria-label="Footer">
+            <Link to="/free" className="footer__link">
+              Why free?
+            </Link>
             <Link to="/security" className="footer__link">
               Security
             </Link>

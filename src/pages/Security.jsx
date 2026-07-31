@@ -2,7 +2,7 @@ import { SECURITY_EMAIL } from '../data/contact.js'
 
 export default function Security() {
   return (
-    <section className="doc">
+    <section className="doc doc--panel">
       <div className="container doc__inner">
         <h1 className="doc__title">Security</h1>
         <p className="doc__lede">
