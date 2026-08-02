@@ -27,18 +27,32 @@ export default function NavBar() {
         </Link>
 
         <nav className="nav__links" aria-label="Primary">
+          {/* About the product */}
           <NavLink to="/how-it-works" className="nav__link">
             How it works
           </NavLink>
-          <NavLink to="/privacy" className="nav__link">
-            Privacy
+          <NavLink to="/team" className="nav__link">
+            Team
+          </NavLink>
+          <NavLink to="/free" className="nav__link">
+            Why free?
           </NavLink>
           <NavLink to="/version" className="nav__link">
             Version
           </NavLink>
+
+          {/* Legal / trust */}
+          <NavLink to="/privacy" className="nav__link">
+            Privacy
+          </NavLink>
           <NavLink to="/terms" className="nav__link">
             Terms
           </NavLink>
+          <NavLink to="/security" className="nav__link">
+            Security
+          </NavLink>
+
+          {/* Support */}
           <a
             href={`mailto:${SUPPORT_EMAIL}?subject=Report%20an%20issue`}
             className="nav__link"

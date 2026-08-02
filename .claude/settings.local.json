@@ -31,7 +31,11 @@
       "Bash(curl -s -o /dev/null -w \"check: %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/)",
       "Bash(curl -s -o /dev/null -w \"check homepage: %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/)",
       "Bash(curl -s -o /dev/null -w \"check dmg: %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/ModGuard-1.0.0-universal.dmg)",
-      "Bash(curl -s -o /dev/null -w \"check: %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/terms)"
+      "Bash(curl -s -o /dev/null -w \"check: %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/terms)",
+      "Bash(kill -9 80573)",
+      "Bash(kill -9 80890)",
+      "Bash(kill -9 81206)",
+      "Bash(rm -rf /Users/ryansoudkhah/Desktop/modguard-site-page/node_modules/.vite)"
     ]
   }
 }

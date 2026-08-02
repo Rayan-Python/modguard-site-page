@@ -269,6 +269,10 @@ main {
   }
 }
 
+.doc--wide .doc__inner {
+  max-width: 900px;
+}
+
 .doc__title {
   font-size: clamp(2rem, 4vw, 2.8rem);
   color: var(--ink);
@@ -383,6 +387,70 @@ main {
   padding-left: 18px;
   color: var(--ink-soft);
   font-size: 1rem;
+}
+
+.team-grid {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.team-card {
+  background: var(--cream-deep);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  opacity: 0.82;
+}
+
+.team-card__avatar {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.team-card__name {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.team-card__badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border: 1px dashed var(--line);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+@media (max-width: 700px) {
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* --------------------------------------------------------------- Footer --- */

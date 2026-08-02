@@ -10,6 +10,7 @@ import Version from './pages/Version.jsx'
 import Terms from './pages/Terms.jsx'
 import Security from './pages/Security.jsx'
 import WhyFree from './pages/WhyFree.jsx'
+import Team from './pages/Team.jsx'
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/security" element={<Security />} />
           <Route path="/free" element={<WhyFree />} />
+          <Route path="/team" element={<Team />} />
         </Routes>
       </main>
       <Footer />

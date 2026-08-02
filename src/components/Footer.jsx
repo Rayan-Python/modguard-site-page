@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom'
-
 export default function Footer() {
   return (
     <footer className="footer">
@@ -11,15 +9,6 @@ export default function Footer() {
               Scan mods and game files for malware before you install them.
             </p>
           </div>
-
-          <nav className="footer__links" aria-label="Footer">
-            <Link to="/free" className="footer__link">
-              Why free?
-            </Link>
-            <Link to="/security" className="footer__link">
-              Security
-            </Link>
-          </nav>
         </div>
 
         {/* Legal disclaimer, kept small and muted */}
