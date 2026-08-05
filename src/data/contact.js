@@ -1,4 +1,5 @@
-// Placeholder addresses, swap for real support inboxes later.
-export const SUPPORT_EMAIL = 'support@modguard.app'
-export const FEEDBACK_EMAIL = 'feedback@modguard.app'
-export const SECURITY_EMAIL = 'security@modguard.app'
+export const SUPPORT_EMAIL = 'support@modguardian.com'
+export const FEEDBACK_EMAIL = 'feedback@modguardian.com'
+export const SECURITY_EMAIL = 'security@modguardian.com'
+
+export const SITE_URL = 'https://modguardian.com'

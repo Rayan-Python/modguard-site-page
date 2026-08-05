@@ -1,3 +1,5 @@
+import Seo from '../components/Seo.jsx'
+
 // Newest release first. Add new entries at the top of this array as they ship.
 const entries = [
   {
@@ -17,6 +19,10 @@ const entries = [
 export default function Version() {
   return (
     <section className="doc doc--panel">
+      <Seo
+        title="ModGuard Version History & Changelog"
+        description="The full version history and changelog for ModGuard, the free game mod malware scanner."
+      />
       <div className="container doc__inner">
         <h1 className="doc__title">Version</h1>
 

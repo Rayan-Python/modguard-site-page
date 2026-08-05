@@ -1,6 +1,12 @@
+import Seo from '../components/Seo.jsx'
+
 export default function Home() {
   return (
     <>
+      <Seo
+        title="ModGuard: Minecraft Mod Scanner & Game File Malware Checker"
+        description="ModGuard is a free malware scanner for Minecraft mods and other game files. Scan before you install, for any game, not just one."
+      />
       <section className="hero">
         <div className="container hero__inner">
           <h1 className="download__title">Download ModGuard</h1>

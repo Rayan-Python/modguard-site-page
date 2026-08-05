@@ -1,6 +1,12 @@
+import Seo from '../components/Seo.jsx'
+
 export default function Privacy() {
   return (
     <section className="doc doc--panel">
+      <Seo
+        title="ModGuard Privacy Policy"
+        description="What ModGuard reads and sends when it scans a mod or game file, and what it never collects."
+      />
       <div className="container doc__inner">
         <h1 className="doc__title">Privacy</h1>
 

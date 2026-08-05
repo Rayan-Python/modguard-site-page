@@ -1,3 +1,5 @@
+import Seo from '../components/Seo.jsx'
+
 const steps = [
   {
     n: '01',
@@ -19,6 +21,10 @@ const steps = [
 export default function HowItWorks() {
   return (
     <section className="doc doc--panel">
+      <Seo
+        title="How ModGuard Scans Game Mods for Malware"
+        description="See how ModGuard, a free game mod malware scanner, checks files before you install them, in three simple steps."
+      />
       <div className="container doc__inner">
         <h1 className="doc__title">How it works</h1>
         <p className="doc__lede">

@@ -1,3 +1,5 @@
+import Seo from '../components/Seo.jsx'
+
 const members = [
   'Ryan Soudkhah',
   'Ryan Norouzi',
@@ -18,6 +20,10 @@ function initials(name) {
 export default function Team() {
   return (
     <section className="doc doc--panel doc--wide">
+      <Seo
+        title="The ModGuard Team"
+        description="Meet the people building ModGuard, a free malware scanner for game mods and files."
+      />
       <div className="container doc__inner">
         <h1 className="doc__title">Team</h1>
         <p className="doc__lede">

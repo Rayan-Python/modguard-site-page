@@ -1,6 +1,12 @@
+import Seo from '../components/Seo.jsx'
+
 export default function WhyFree() {
   return (
     <section className="doc doc--panel">
+      <Seo
+        title="Why Is ModGuard Free?"
+        description="ModGuard is free because gamers shouldn't have to pay for basic safety. Here's how we plan to keep it that way."
+      />
       <div className="container doc__inner">
         <h1 className="doc__title">Why is ModGuard free?</h1>
         <p className="doc__lede">

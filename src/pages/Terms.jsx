@@ -1,8 +1,13 @@
 import { SUPPORT_EMAIL } from '../data/contact.js'
+import Seo from '../components/Seo.jsx'
 
 export default function Terms() {
   return (
     <section className="doc doc--panel">
+      <Seo
+        title="ModGuard Terms & Conditions"
+        description="The terms and conditions for using ModGuard to scan game mods and files for malware."
+      />
       <div className="container doc__inner">
         <h1 className="doc__title">Terms &amp; Conditions</h1>
 

@@ -1,8 +1,13 @@
 import { SECURITY_EMAIL } from '../data/contact.js'
+import Seo from '../components/Seo.jsx'
 
 export default function Security() {
   return (
     <section className="doc doc--panel">
+      <Seo
+        title="ModGuard Security & Vulnerability Disclosure"
+        description="How to privately report a security vulnerability in ModGuard, the game mod malware scanner."
+      />
       <div className="container doc__inner">
         <h1 className="doc__title">Security</h1>
         <p className="doc__lede">
