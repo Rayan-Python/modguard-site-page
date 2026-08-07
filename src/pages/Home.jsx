@@ -17,7 +17,7 @@ export default function Home() {
           <div className="hero__actions">
             <a
               className="btn btn--primary"
-              href="https://github.com/Rayan-Python/modguard-site-page/releases/download/v1.4.0/ModGuard-1.4.0-universal.dmg"
+              href="https://github.com/Rayan-Python/modguard-site-page/releases/download/v1.9.0/ModGuard-1.9.0-universal.dmg"
             >
               <svg
                 className="btn__icon"
@@ -34,6 +34,7 @@ export default function Home() {
               Download for macOS
             </a>
           </div>
+          <p className="hero__meta">Windows version coming soon.</p>
         </div>
       </section>
     </>

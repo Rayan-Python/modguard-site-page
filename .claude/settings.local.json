@@ -35,7 +35,8 @@
       "Bash(kill -9 80573)",
       "Bash(kill -9 80890)",
       "Bash(kill -9 81206)",
-      "Bash(rm -rf /Users/ryansoudkhah/Desktop/modguard-site-page/node_modules/.vite)"
+      "Bash(rm -rf /Users/ryansoudkhah/Desktop/modguard-site-page/node_modules/.vite)",
+      "Bash(kill -9 41085)"
     ]
   }
 }

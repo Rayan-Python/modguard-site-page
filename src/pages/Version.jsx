@@ -3,10 +3,10 @@ import Seo from '../components/Seo.jsx'
 // Newest release first. Add new entries at the top of this array as they ship.
 const entries = [
   {
-    version: 'v1.4.0',
+    version: 'v1.9.0',
     date: null,
     current: true,
-    changes: ['Improved detection accuracy'],
+    changes: ['Improved detection accuracy and verification', 'Updated UI'],
   },
   {
     version: 'v1.0.0',
