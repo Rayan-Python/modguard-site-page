@@ -131,8 +131,10 @@ main {
 }
 
 .nav__mark {
-  display: inline-flex;
-  color: var(--forest);
+  display: block;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
 .nav__name {
@@ -289,6 +291,17 @@ main {
   font-size: 1.1rem;
   color: var(--ink-soft);
   margin-bottom: 40px;
+}
+
+.not-found {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.not-found .doc__lede {
+  margin-bottom: 32px;
 }
 
 .doc__heading {
@@ -480,6 +493,19 @@ main {
   flex-wrap: wrap;
   padding-bottom: 32px;
   border-bottom: 1px solid var(--line);
+}
+
+.footer__brand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer__mark {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .footer__name {

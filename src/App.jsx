@@ -11,6 +11,7 @@ import Terms from './pages/Terms.jsx'
 import Security from './pages/Security.jsx'
 import WhyFree from './pages/WhyFree.jsx'
 import Team from './pages/Team.jsx'
+import NotFound from './pages/NotFound.jsx'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/security" element={<Security />} />
           <Route path="/free" element={<WhyFree />} />
           <Route path="/team" element={<Team />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />

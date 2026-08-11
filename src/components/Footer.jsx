@@ -4,7 +4,10 @@ export default function Footer() {
       <div className="footer__inner">
         <div className="footer__top">
           <div className="footer__brand">
-            <span className="footer__name">ModGuard</span>
+            <div className="footer__brand-row">
+              <img src="/logo.png" alt="" className="footer__mark" />
+              <span className="footer__name">ModGuard</span>
+            </div>
             <p className="footer__blurb">
               Scan mods and game files for malware before you install them.
             </p>

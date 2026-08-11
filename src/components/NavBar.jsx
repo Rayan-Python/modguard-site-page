@@ -6,23 +6,7 @@ export default function NavBar() {
     <header className="nav">
       <div className="nav__inner">
         <Link to="/" className="nav__brand" aria-label="ModGuard home">
-          <span className="nav__mark" aria-hidden="true">
-            {/* Logo placeholder, swap for real ModGuard logo later */}
-            <svg viewBox="0 0 32 32" width="26" height="26">
-              <path
-                d="M16 3 L27 7 V16 C27 23 22 28 16 29.5 C10 28 5 23 5 16 V7 Z"
-                fill="currentColor"
-              />
-              <path
-                d="M11 16.5 L14.5 20 L21.5 12"
-                fill="none"
-                stroke="#0d0d0d"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
+          <img src="/logo.png" alt="" className="nav__mark" />
           <span className="nav__name">ModGuard</span>
         </Link>
 

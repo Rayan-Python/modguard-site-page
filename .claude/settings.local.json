@@ -36,7 +36,19 @@
       "Bash(kill -9 80890)",
       "Bash(kill -9 81206)",
       "Bash(rm -rf /Users/ryansoudkhah/Desktop/modguard-site-page/node_modules/.vite)",
-      "Bash(kill -9 41085)"
+      "Bash(kill -9 41085)",
+      "Bash(sips -s format png ~/Desktop/modguard_logo.jpeg --out /Users/ryansoudkhah/Desktop/modguard-site-page/public/logo.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/ryansoudkhah/Desktop/modguard-site-page/public/logo.png)",
+      "Bash(sips -Z 32 logo.png --out favicon-32.png)",
+      "Bash(sips -Z 180 logo.png --out apple-touch-icon.png)",
+      "Bash(sips -Z 320 logo.png --out /tmp/logo-og-src.png)",
+      "Bash(sips -p 630 1200 --padColor 0D0D0D /tmp/logo-og-src.png --out og-image.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight og-image.png)",
+      "Bash(curl -s -o /dev/null -w \"check logo: %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/logo.png)",
+      "Bash(curl -s -o /dev/null -w \"check favicon: %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/favicon-32.png)",
+      "Bash(curl -s -o /dev/null -w \"check og-image: %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:5174/og-image.png)",
+      "Bash(curl -s \"https://api.github.com/repos/Rayan-Python/modguard-site-page/releases/latest\")",
+      "Bash(python3 -c ' *)"
     ]
   }
 }

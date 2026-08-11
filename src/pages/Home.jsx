@@ -1,4 +1,5 @@
 import Seo from '../components/Seo.jsx'
+import DownloadCount from '../components/DownloadCount.jsx'
 
 export default function Home() {
   return (
@@ -35,6 +36,7 @@ export default function Home() {
             </a>
           </div>
           <p className="hero__meta">Windows version coming soon.</p>
+          <DownloadCount />
         </div>
       </section>
     </>
