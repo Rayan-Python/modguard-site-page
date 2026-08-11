@@ -1,5 +1,14 @@
+import { Fragment } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { SUPPORT_EMAIL, FEEDBACK_EMAIL } from '../data/contact.js'
+
+const links = [
+  { to: '/how-it-works', label: 'How it works' },
+  { to: '/team', label: 'Team' },
+  { to: '/version', label: 'Version' },
+  { to: '/privacy', label: 'Privacy' },
+  { to: '/terms', label: 'Terms' },
+]
 
 export default function NavBar() {
   return (
@@ -11,38 +20,22 @@ export default function NavBar() {
         </Link>
 
         <nav className="nav__links" aria-label="Primary">
-          {/* About the product */}
-          <NavLink to="/how-it-works" className="nav__link">
-            How it works
-          </NavLink>
-          <NavLink to="/team" className="nav__link">
-            Team
-          </NavLink>
-          <NavLink to="/free" className="nav__link">
-            Why free?
-          </NavLink>
-          <NavLink to="/version" className="nav__link">
-            Version
-          </NavLink>
-
-          {/* Legal / trust */}
-          <NavLink to="/privacy" className="nav__link">
-            Privacy
-          </NavLink>
-          <NavLink to="/terms" className="nav__link">
-            Terms
-          </NavLink>
-          <NavLink to="/security" className="nav__link">
-            Security
-          </NavLink>
-
-          {/* Support */}
+          {links.map((link, i) => (
+            <Fragment key={link.to}>
+              {i > 0 && <span className="nav__divider" aria-hidden="true" />}
+              <NavLink to={link.to} className="nav__link">
+                {link.label}
+              </NavLink>
+            </Fragment>
+          ))}
+          <span className="nav__divider" aria-hidden="true" />
           <a
             href={`mailto:${SUPPORT_EMAIL}?subject=Report%20an%20issue`}
             className="nav__link"
           >
             Report an issue
           </a>
+          <span className="nav__divider" aria-hidden="true" />
           <a
             href={`mailto:${FEEDBACK_EMAIL}?subject=ModGuard%20feedback`}
             className="nav__link"

@@ -1,11 +1,36 @@
 import Seo from '../components/Seo.jsx'
 
 const members = [
-  'Ryan Soudkhah',
-  'Ryan Norouzi',
-  'Geffen Alon',
-  'Edward Chang',
-  'Darren Kapturski',
+  {
+    name: 'Ryan Norouzi',
+    age: 17,
+    school: 'Bergen County Technical High School, Teterboro',
+    role: 'Chief Executive Officer',
+  },
+  {
+    name: 'Ryan Soudkhah',
+    age: 16,
+    school: 'Northern Highlands Regional High School',
+    role: 'Chief Technology Officer',
+  },
+  {
+    name: 'Darren Kapturski',
+    age: 16,
+    school: 'Bergen County Technical High School, Teterboro',
+    role: 'Business Development Representative',
+  },
+  {
+    name: 'Edward Chang',
+    age: 17,
+    school: 'Bergen County Technical High School, Teterboro',
+    role: 'Research Lead',
+  },
+  {
+    name: 'Geffen Alon',
+    age: 17,
+    school: 'Bergen County Technical High School, Teterboro',
+    role: 'Business Operations',
+  },
 ]
 
 function initials(name) {
@@ -26,18 +51,19 @@ export default function Team() {
       />
       <div className="container doc__inner">
         <h1 className="doc__title">Team</h1>
-        <p className="doc__lede">
-          The people building ModGuard. Full bios coming soon.
-        </p>
+        <p className="doc__lede">The people building ModGuard.</p>
 
         <ul className="team-grid">
-          {members.map((name) => (
-            <li className="team-card" key={name}>
+          {members.map((member) => (
+            <li className="team-card" key={member.name}>
               <span className="team-card__avatar" aria-hidden="true">
-                {initials(name)}
+                {initials(member.name)}
               </span>
-              <p className="team-card__name">{name}</p>
-              <span className="team-card__badge">Coming soon</span>
+              <p className="team-card__name">{member.name}</p>
+              <p className="team-card__role">{member.role}</p>
+              <p className="team-card__meta">
+                {member.school} &middot; Age {member.age}
+              </p>
             </li>
           ))}
         </ul>

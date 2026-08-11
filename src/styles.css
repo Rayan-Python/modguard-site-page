@@ -147,9 +147,12 @@ main {
 
 .nav__links {
   display: flex;
+  flex: 1;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 4px 6px;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 40px;
+  row-gap: 10px;
 }
 
 .nav__link {
@@ -157,19 +160,24 @@ main {
   color: var(--ink-soft);
   font-size: 0.9rem;
   font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 999px;
-  transition: color 0.18s ease, background 0.18s ease;
+  white-space: nowrap;
+  transition: color 0.18s ease;
 }
 
 .nav__link:hover {
   color: var(--ink);
-  background: color-mix(in srgb, var(--moss) 16%, transparent);
 }
 
 .nav__link.active {
   color: var(--ink);
-  background: color-mix(in srgb, var(--moss) 22%, transparent);
+  font-weight: 600;
+}
+
+.nav__divider {
+  width: 1px;
+  height: 14px;
+  background: var(--line);
+  flex-shrink: 0;
 }
 
 /* ----------------------------------------------------------------- Hero --- */
@@ -423,7 +431,6 @@ main {
   border-radius: var(--radius);
   padding: 28px 20px;
   text-align: center;
-  opacity: 0.82;
 }
 
 .team-card__avatar {
@@ -445,19 +452,21 @@ main {
   font-family: var(--serif);
   font-size: 1.05rem;
   color: var(--ink);
-  margin-bottom: 12px;
+  margin-bottom: 6px;
 }
 
-.team-card__badge {
-  display: inline-block;
-  font-size: 0.7rem;
+.team-card__role {
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--moss);
+  margin-bottom: 10px;
+}
+
+.team-card__meta {
+  font-size: 0.85rem;
   color: var(--ink-soft);
-  border: 1px dashed var(--line);
-  border-radius: 999px;
-  padding: 3px 10px;
+  line-height: 1.5;
 }
 
 @media (max-width: 700px) {
@@ -522,18 +531,12 @@ main {
   color: color-mix(in srgb, var(--ink) 72%, transparent);
 }
 
-.footer__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  align-items: flex-start;
-  max-width: 420px;
-}
-
 .footer__link {
+  display: inline-block;
+  margin-top: 28px;
   text-decoration: none;
   color: color-mix(in srgb, var(--ink) 82%, transparent);
-  font-size: 0.98rem;
+  font-size: 0.94rem;
   transition: color 0.16s ease;
 }
 
@@ -542,7 +545,7 @@ main {
 }
 
 .footer__disclaimer {
-  margin-top: 28px;
+  margin-top: 14px;
   max-width: 620px;
   font-size: 0.84rem;
   line-height: 1.6;

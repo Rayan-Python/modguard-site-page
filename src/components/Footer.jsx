@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function Footer() {
   return (
     <footer className="footer">
@@ -13,6 +15,10 @@ export default function Footer() {
             </p>
           </div>
         </div>
+
+        <Link to="/free" className="footer__link">
+          Why free?
+        </Link>
 
         {/* Legal disclaimer, kept small and muted */}
         <p className="footer__disclaimer">
