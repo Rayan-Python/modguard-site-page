@@ -8,12 +8,17 @@ export default function DownloadCount() {
   useEffect(() => {
     let cancelled = false
 
-    fetch(`https://api.github.com/repos/${REPO}/releases/latest`)
+    fetch(`https://api.github.com/repos/${REPO}/releases?per_page=100`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((release) => {
+      .then((releases) => {
         if (cancelled) return
-        const asset = release.assets?.find((a) => a.name.endsWith('.dmg'))
-        if (asset) setCount(asset.download_count)
+        const total = releases.reduce((sum, release) => {
+          const releaseTotal = (release.assets ?? [])
+            .filter((a) => a.name.endsWith('.dmg'))
+            .reduce((s, a) => s + a.download_count, 0)
+          return sum + releaseTotal
+        }, 0)
+        setCount(total)
       })
       .catch(() => {})
 
