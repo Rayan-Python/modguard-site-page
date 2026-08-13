@@ -17,13 +17,13 @@ const members = [
     name: 'Darren Kapturski',
     age: 16,
     school: 'Bergen County Technical High School, Teterboro',
-    role: 'Business Development Representative',
+    role: 'Chief Business Development Officer',
   },
   {
     name: 'Edward Chang',
     age: 17,
     school: 'Bergen County Technical High School, Teterboro',
-    role: 'Research Lead',
+    role: 'Head of Research & Analysis',
   },
   {
     name: 'Geffen Alon',
