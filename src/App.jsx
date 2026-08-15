@@ -12,6 +12,7 @@ import Security from './pages/Security.jsx'
 import WhyFree from './pages/WhyFree.jsx'
 import Team from './pages/Team.jsx'
 import NotFound from './pages/NotFound.jsx'
+import InternalStats from './pages/InternalStats.jsx'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/security" element={<Security />} />
           <Route path="/free" element={<WhyFree />} />
           <Route path="/team" element={<Team />} />
+          <Route path="/internal-stats" element={<InternalStats />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

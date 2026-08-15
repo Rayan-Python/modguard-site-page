@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 const REPO = 'Rayan-Python/modguard-site-page'
 
-export default function DownloadCount() {
+export default function useDownloadCount() {
   const [count, setCount] = useState(null)
 
   useEffect(() => {
@@ -27,9 +27,5 @@ export default function DownloadCount() {
     }
   }, [])
 
-  if (count === null) return null
-
-  return (
-    <p className="hero__meta">{count.toLocaleString()} downloads</p>
-  )
+  return count
 }
