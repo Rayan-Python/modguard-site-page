@@ -20,6 +20,44 @@ function AppleIcon({ className }) {
   )
 }
 
+function WindowsIcon({ className }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      aria-hidden="true"
+    >
+      <path
+        fill="currentColor"
+        d="M3 5.5 10.4 4.5V11.3H3V5.5ZM11.3 4.4 21 3V11.2H11.3V4.4ZM3 12.3H10.4V19.1L3 18.1V12.3ZM11.3 12.3H21V20.5L11.3 19.2V12.3Z"
+      />
+    </svg>
+  )
+}
+
+function ScrollCue() {
+  return (
+    <div className="scroll-cue" aria-hidden="true">
+      <span className="scroll-cue__label">Scroll to download</span>
+      <svg
+        className="scroll-cue__chevron"
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M6 9 L12 15 L18 9" />
+      </svg>
+    </div>
+  )
+}
+
 export default function Home() {
   return (
     <>
@@ -27,20 +65,50 @@ export default function Home() {
         title="ModGuard: Minecraft Mod Scanner & Game File Malware Checker"
         description="ModGuard is a free malware scanner for Minecraft mods and other game files. Scan before you install, for any game, not just one."
       />
+
       <section className="hero">
-        <div className="container hero__inner">
-          <h1 className="download__title">Download ModGuard</h1>
-          <p className="download__subtitle">
-            Scan mods and game files for malware before you install them.
+        <img src="/logo.png" alt="" className="hero__watermark" />
+        <div className="hero__inner">
+          <p className="hero__eyebrow">Making Gaming Safer.</p>
+          <h1 className="hero__headline">
+            Scan mods.
+            <br />
+            Play safe.
+          </h1>
+          <p className="hero__subtext">
+            Catch malware before it catches you.
+          </p>
+        </div>
+        <ScrollCue />
+      </section>
+
+      <section className="download">
+        <div className="download__inner">
+          <h2 className="download__heading">Download ModGuard</h2>
+          <p className="download__sub">
+            Available now for macOS. Windows coming soon.
           </p>
 
-          <div className="hero__actions">
-            <a className="btn btn--primary" href={DMG_URL}>
-              <AppleIcon className="btn__icon" />
-              Download for macOS
-            </a>
+          <div className="download__cards">
+            <div className="dl-card">
+              <AppleIcon className="dl-card__icon" />
+              <span className="dl-card__label">macOS</span>
+              <a className="dl-card__btn dl-card__btn--active" href={DMG_URL}>
+                Download for Mac
+              </a>
+            </div>
+
+            <div className="dl-card dl-card--disabled">
+              <WindowsIcon className="dl-card__icon" />
+              <span className="dl-card__label">Windows</span>
+              <span
+                className="dl-card__btn dl-card__btn--soon"
+                title="Windows support is coming September 15."
+              >
+                Coming September 15
+              </span>
+            </div>
           </div>
-          <p className="hero__meta">Windows version coming soon.</p>
         </div>
       </section>
     </>

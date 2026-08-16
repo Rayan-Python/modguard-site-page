@@ -2,7 +2,6 @@ import { Analytics } from '@vercel/analytics/react'
 import { Routes, Route } from 'react-router-dom'
 import NavBar from './components/NavBar.jsx'
 import Footer from './components/Footer.jsx'
-import DotGrid from './components/DotGrid.jsx'
 import Home from './pages/Home.jsx'
 import Privacy from './pages/Privacy.jsx'
 import HowItWorks from './pages/HowItWorks.jsx'
@@ -17,7 +16,6 @@ import InternalStats from './pages/InternalStats.jsx'
 export default function App() {
   return (
     <div className="site">
-      <DotGrid />
       <NavBar />
       <main>
         <Routes>
