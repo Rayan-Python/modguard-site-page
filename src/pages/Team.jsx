@@ -3,31 +3,26 @@ import Seo from '../components/Seo.jsx'
 const members = [
   {
     name: 'Ryan Norouzi',
-    age: 17,
     school: 'Bergen County Technical High School, Teterboro',
     role: 'Chief Executive Officer',
   },
   {
     name: 'Ryan Soudkhah',
-    age: 16,
     school: 'Northern Highlands Regional High School',
     role: 'Chief Technology Officer',
   },
   {
     name: 'Darren Kapturski',
-    age: 16,
     school: 'Bergen County Technical High School, Teterboro',
     role: 'Chief Business Development Officer',
   },
   {
     name: 'Edward Chang',
-    age: 17,
     school: 'Bergen County Technical High School, Teterboro',
     role: 'Head of Research & Analysis',
   },
   {
     name: 'Geffen Alon',
-    age: 17,
     school: 'Bergen County Technical High School, Teterboro',
     role: 'Business Operations',
   },
@@ -61,9 +56,7 @@ export default function Team() {
               </span>
               <p className="team-card__name">{member.name}</p>
               <p className="team-card__role">{member.role}</p>
-              <p className="team-card__meta">
-                {member.school} &middot; Age {member.age}
-              </p>
+              <p className="team-card__meta">{member.school}</p>
             </li>
           ))}
         </ul>
