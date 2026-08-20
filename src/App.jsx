@@ -5,6 +5,7 @@ import Footer from './components/Footer.jsx'
 import Home from './pages/Home.jsx'
 import Privacy from './pages/Privacy.jsx'
 import HowItWorks from './pages/HowItWorks.jsx'
+import Detection from './pages/Detection.jsx'
 import Version from './pages/Version.jsx'
 import Terms from './pages/Terms.jsx'
 import Security from './pages/Security.jsx'
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/detection" element={<Detection />} />
           <Route path="/version" element={<Version />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/security" element={<Security />} />
