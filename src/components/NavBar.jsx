@@ -1,6 +1,5 @@
 import { Fragment, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { SUPPORT_EMAIL, FEEDBACK_EMAIL } from '../data/contact.js'
 
 const links = [
   { to: '/how-it-works', label: 'How it works' },
@@ -9,6 +8,7 @@ const links = [
   { to: '/version', label: 'Version' },
   { to: '/privacy', label: 'Privacy' },
   { to: '/terms', label: 'Terms' },
+  { to: '/contact', label: 'Contact' },
 ]
 
 export default function NavBar() {
@@ -52,22 +52,6 @@ export default function NavBar() {
               </NavLink>
             </Fragment>
           ))}
-          <span className="nav__divider" aria-hidden="true" />
-          <a
-            href={`mailto:${SUPPORT_EMAIL}?subject=Report%20an%20issue`}
-            className="nav__link"
-            onClick={close}
-          >
-            Report an issue
-          </a>
-          <span className="nav__divider" aria-hidden="true" />
-          <a
-            href={`mailto:${FEEDBACK_EMAIL}?subject=ModGuard%20feedback`}
-            className="nav__link"
-            onClick={close}
-          >
-            Feedback
-          </a>
         </nav>
       </div>
     </header>

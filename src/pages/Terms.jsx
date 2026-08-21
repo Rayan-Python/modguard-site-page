@@ -1,9 +1,116 @@
-import { SUPPORT_EMAIL } from '../data/contact.js'
 import Seo from '../components/Seo.jsx'
+import {
+  DocCheckGlyph,
+  ScanGlyph,
+  InfoGlyph,
+  ScaleGlyph,
+  UserGlyph,
+  DeviceGlyph,
+  DatabaseGlyph,
+  ExternalGlyph,
+  MinorsGlyph,
+  RefreshGlyph,
+  MailGlyph,
+} from '../components/GlyphIcons.jsx'
+
+const items = [
+  {
+    n: '01',
+    Icon: DocCheckGlyph,
+    title: 'Acceptance of Terms',
+    body: "By using ModGuard, you agree to these terms. If you don't, don't use it.",
+  },
+  {
+    n: '02',
+    Icon: ScanGlyph,
+    title: 'What ModGuard Does',
+    body: 'ModGuard scans mod files, and sometimes watches activity while a game runs, for malware and suspicious behavior. A clean scan means no known threats were found, not a guarantee.',
+  },
+  {
+    n: '03',
+    Icon: InfoGlyph,
+    title: 'No Warranty',
+    body: 'ModGuard is provided "as is," with no warranties. We can’t guarantee it catches every threat or works on every system.',
+  },
+  {
+    n: '04',
+    Icon: ScaleGlyph,
+    title: 'Limitation of Liability',
+    body: 'We aren’t liable for any damage, data loss, or account loss from using ModGuard, including a missed threat or a false result.',
+  },
+  {
+    n: '05',
+    Icon: UserGlyph,
+    title: 'User Responsibility',
+    body: 'Use your own judgment when installing mods. ModGuard is an extra safety layer, not a replacement for checking sources yourself.',
+  },
+  {
+    n: '06',
+    Icon: DeviceGlyph,
+    title: 'Device and System Access',
+    body: (
+      <>
+        ModGuard accesses only what it needs to scan a file, including watching
+        a running game. It never collects unrelated data. See our{' '}
+        <a href="/privacy" className="doc__link">
+          Privacy Policy
+        </a>
+        .
+      </>
+    ),
+  },
+  {
+    n: '07',
+    Icon: DatabaseGlyph,
+    title: 'Data Collection',
+    body: (
+      <>
+        We may keep scan results, like threats found and file metadata, to
+        improve detection. Never personal files or credentials. See our{' '}
+        <a href="/privacy" className="doc__link">
+          Privacy Policy
+        </a>
+        .
+      </>
+    ),
+  },
+  {
+    n: '08',
+    Icon: ExternalGlyph,
+    title: 'Third-Party Mods',
+    body: "ModGuard scans content we don’t own or control. We’re responsible for our detection, not for the mods themselves.",
+  },
+  {
+    n: '09',
+    Icon: MinorsGlyph,
+    title: 'Minors',
+    body: "If you’re a minor, get a parent or guardian’s permission before using ModGuard.",
+  },
+  {
+    n: '10',
+    Icon: RefreshGlyph,
+    title: 'Changes to These Terms',
+    body: 'These terms may change as ModGuard evolves. Continuing to use it means you accept the updates.',
+  },
+  {
+    n: '11',
+    Icon: MailGlyph,
+    title: 'Contact',
+    body: (
+      <>
+        Questions about these terms? Reach us through the{' '}
+        <a href="/contact" className="doc__link">
+          Contact tab
+        </a>{' '}
+        up top.
+      </>
+    ),
+  },
+]
 
 export default function Terms() {
   return (
-    <section className="doc doc--panel">
+    <section className="doc doc--wide">
       <Seo
         title="ModGuard Terms & Conditions"
         description="The terms and conditions for using ModGuard to scan game mods and files for malware."
@@ -11,101 +118,20 @@ export default function Terms() {
       <div className="container doc__inner">
         <h1 className="doc__title">Terms &amp; Conditions</h1>
 
-        <h2 className="doc__heading">1. Acceptance of Terms</h2>
-        <p className="doc__body">
-          Using ModGuard means you agree to these terms. If you don't agree,
-          you shouldn't use the software.
-        </p>
-
-        <h2 className="doc__heading">2. What ModGuard Does</h2>
-        <p className="doc__body">
-          ModGuard is a detection tool that scans third-party mod files and,
-          in some cases, monitors activity while a game is actively running,
-          for signs of malware, suspicious behavior, or known malicious
-          patterns. ModGuard does not guarantee that a mod is completely
-          safe, only that it did not detect known threat patterns at the time
-          of the scan.
-        </p>
-
-        <h2 className="doc__heading">3. No Warranty / As-Is Basis</h2>
-        <p className="doc__body">
-          ModGuard is provided "as is" without warranties of any kind,
-          express or implied. We do not guarantee that ModGuard will catch
-          every threat, that it is error-free, or that it will be compatible
-          with every system, mod, or game version.
-        </p>
-
-        <h2 className="doc__heading">4. Limitation of Liability</h2>
-        <p className="doc__body">
-          ModGuard and its creators are not liable for any damages, data
-          loss, account loss, in-game losses, or system harm resulting from
-          the use or inability to use ModGuard, including cases where a
-          malicious mod was not detected, or where a false positive or false
-          negative occurred.
-        </p>
-
-        <h2 className="doc__heading">5. User Responsibility</h2>
-        <p className="doc__body">
-          You're responsible for exercising your own judgment when installing
-          third-party mods, regardless of ModGuard's scan results. ModGuard
-          is a supplementary safety tool, not a replacement for careful,
-          independent verification of mod sources.
-        </p>
-
-        <h2 className="doc__heading">6. Device and System Access</h2>
-        <p className="doc__body">
-          ModGuard may access certain files, processes, or system activity on
-          your device in order to perform scans, including monitoring while a
-          game is actively running. This access is limited to what's
-          necessary to detect malicious behavior and is not used to collect
-          unrelated personal data. Full details are available in our{' '}
-          <a href="/privacy" className="doc__link">
-            Privacy Policy
-          </a>
-          .
-        </p>
-
-        <h2 className="doc__heading">7. Data Collection</h2>
-        <p className="doc__body">
-          Scan results, such as detected threats, risk scores, and file
-          metadata, may be collected to improve detection accuracy and
-          maintain our threat database. This does not include personal
-          files, credentials, or unrelated personal information. See our{' '}
-          <a href="/privacy" className="doc__link">
-            Privacy Policy
-          </a>{' '}
-          for full details.
-        </p>
-
-        <h2 className="doc__heading">8. Third-Party Mods and Content</h2>
-        <p className="doc__body">
-          ModGuard scans third-party content that we do not create, own, or
-          control. We are not responsible for the content, behavior, or
-          safety of any mod itself, only for the accuracy of our detection at
-          the time of scanning.
-        </p>
-
-        <h2 className="doc__heading">9. Minors</h2>
-        <p className="doc__body">
-          If you're a minor, you should have a parent or guardian's
-          permission before downloading and using ModGuard.
-        </p>
-
-        <h2 className="doc__heading">10. Changes to These Terms</h2>
-        <p className="doc__body">
-          These terms may be updated periodically as ModGuard evolves.
-          Continued use of ModGuard after changes are posted constitutes
-          acceptance of the updated terms.
-        </p>
-
-        <h2 className="doc__heading">11. Contact</h2>
-        <p className="doc__body">
-          Questions about these terms can be directed to{' '}
-          <a href={`mailto:${SUPPORT_EMAIL}`} className="doc__link">
-            {SUPPORT_EMAIL}
-          </a>
-          .
-        </p>
+        <div className="doc-cards">
+          {items.map((item) => (
+            <div className="doc-card" key={item.n}>
+              <div className="doc-card__head">
+                <span className="doc-card__icon">
+                  <item.Icon />
+                </span>
+                <span className="doc-card__num">{item.n}</span>
+              </div>
+              <h2 className="doc-card__title">{item.title}</h2>
+              <p className="doc-card__body">{item.body}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )
