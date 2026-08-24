@@ -867,6 +867,137 @@ main {
   border-color: var(--ink);
 }
 
+/* ----------------------------------------------------------- Pipeline ----- */
+
+.pipeline-section {
+  padding: 24px 0 96px;
+}
+
+.pipeline__heading {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  color: var(--ink);
+  text-align: center;
+}
+
+.pipeline__sub-heading {
+  text-align: center;
+  color: var(--ink-soft);
+  margin-top: 8px;
+  margin-bottom: 44px;
+}
+
+.pipeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.pipeline__item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pipeline__stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 28px 18px;
+  background: #0a0a0a;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  opacity: 0;
+  transform: translateX(-18px);
+  transition: opacity 0.5s ease, transform 0.5s ease,
+    border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.pipeline--visible .pipeline__stage {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.pipeline__stage:hover {
+  border-color: color-mix(in srgb, var(--ink) 45%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent);
+  transform: scale(1.035);
+}
+
+.pipeline--visible .pipeline__stage:hover {
+  transform: scale(1.035);
+}
+
+.pipeline__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--ink) 34%, transparent);
+  color: var(--ink);
+}
+
+.pipeline__title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.pipeline__sub {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.pipeline__arrow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 860px) {
+  .pipeline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pipeline__item {
+    flex-direction: column;
+  }
+
+  .pipeline__stage {
+    width: 100%;
+    transform: translateY(-14px);
+  }
+
+  .pipeline--visible .pipeline__stage {
+    transform: translateY(0);
+  }
+
+  .pipeline__arrow {
+    width: auto;
+    height: 20px;
+  }
+
+  .pipeline__arrow svg {
+    transform: rotate(90deg);
+  }
+}
+
 /* ------------------------------------------------------------- Doc cards --- */
 
 .doc-cards {
