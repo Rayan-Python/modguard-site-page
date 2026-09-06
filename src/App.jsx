@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { Routes, Route } from 'react-router-dom'
 import NavBar from './components/NavBar.jsx'
 import Footer from './components/Footer.jsx'
+import TermsGate from './components/TermsGate.jsx'
 import Home from './pages/Home.jsx'
 import Privacy from './pages/Privacy.jsx'
 import HowItWorks from './pages/HowItWorks.jsx'
@@ -14,6 +15,8 @@ import Team from './pages/Team.jsx'
 import Contact from './pages/Contact.jsx'
 import NotFound from './pages/NotFound.jsx'
 import InternalStats from './pages/InternalStats.jsx'
+// SecurityTools import removed temporarily — /security-tools route is rolled
+// back below while the feature is finished. Component is untouched.
 
 export default function App() {
   return (
@@ -36,6 +39,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <TermsGate />
       <Analytics />
     </div>
   )

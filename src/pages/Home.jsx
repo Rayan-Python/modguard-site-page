@@ -1,7 +1,5 @@
 import Seo from '../components/Seo.jsx'
-
-const DMG_URL =
-  'https://github.com/Rayan-Python/modguard-site-page/releases/download/v3.0.0/ModGuard-1.28.0-universal.dmg'
+import { DMG_URL } from '../data/release.js'
 
 function AppleIcon({ className }) {
   return (
@@ -82,7 +80,7 @@ export default function Home() {
         <ScrollCue />
       </section>
 
-      <section className="download">
+      <section className="download" id="download">
         <div className="download__inner">
           <h2 className="download__heading">Download ModGuard</h2>
           <p className="download__sub">

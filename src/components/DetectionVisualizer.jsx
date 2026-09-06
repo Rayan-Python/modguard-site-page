@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from 'react'
 
 const ANALYZERS = [
   {
-    running: 'Checking filename…',
-    pass: 'Filename looks normal',
-    flag: 'Filename mimics a trusted mod',
+    running: 'Checking the file is what it claims…',
+    pass: 'Contents match the file extension',
+    flag: 'Named like a mod, but the contents are a program',
   },
   {
     running: 'Checking for auto-execute patterns…',

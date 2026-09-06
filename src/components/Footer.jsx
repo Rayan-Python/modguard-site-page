@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 const INSTAGRAM_URL = 'https://www.instagram.com/modguard_protections/'
 const LINKEDIN_URL =
   'https://www.linkedin.com/company/modguard-protections/posts/?feedView=all'
+const DISCORD_URL = 'https://discord.gg/xvsSUQrzM'
 
 function InstagramIcon() {
   return (
@@ -39,6 +40,26 @@ function LinkedInIcon() {
       <line x1="8" y1="11" x2="8" y2="16.5" />
       <circle cx="8" cy="7.9" r="0.6" fill="currentColor" stroke="none" />
       <path d="M11.5 16.5 V11 M11.5 13 C11.5 11.6 12.6 11 13.8 11 C15.1 11 16 11.9 16 13.4 V16.5" />
+    </svg>
+  )
+}
+
+function DiscordIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="22"
+      height="22"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M8.9 17.8C7.1 17.5 5.9 16.8 5.4 15.7 4.6 12.9 5.4 9.8 7.2 7.5c1.2-.6 2.5-1 3.8-1.1a9 9 0 0 1 2 0c1.3.1 2.6.5 3.8 1.1 1.8 2.3 2.6 5.4 1.8 8.2-.5 1.1-1.7 1.8-3.5 2.1a9 9 0 0 1-.8-1.5 10 10 0 0 1-4.6 0 9 9 0 0 1-.8 1.5Z" />
+      <circle cx="9.7" cy="12.4" r="0.85" fill="currentColor" stroke="none" />
+      <circle cx="14.3" cy="12.4" r="0.85" fill="currentColor" stroke="none" />
     </svg>
   )
 }
@@ -90,6 +111,14 @@ export default function Footer() {
             aria-label="ModGuard on LinkedIn"
           >
             <LinkedInIcon />
+          </a>
+          <a
+            href={DISCORD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="ModGuard on Discord"
+          >
+            <DiscordIcon />
           </a>
         </div>
       </div>

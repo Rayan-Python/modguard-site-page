@@ -1,12 +1,22 @@
 import Seo from '../components/Seo.jsx'
+import { RELEASE_TAG } from '../data/release.js'
 
 // Newest release first. Add new entries at the top of this array as they ship.
+// The current entry's version comes from src/data/release.js so the changelog,
+// the download link and the packaged app can never disagree.
 const entries = [
   {
-    version: 'v2.0.0',
+    version: RELEASE_TAG,
     date: null,
     current: true,
-    changes: ['Updated UI', 'Improved detection accuracy'],
+    changes: [
+      'Rebuilt detection: Java bytecode analysis across 28 behaviour categories, replacing text pattern matching',
+      'Nested jars are now judged on whether the mod declares them, so ordinary bundled libraries stop being flagged as droppers',
+      'Filename check compares the extension against the file\u2019s actual contents',
+      'Live watch runs a mod in a sandboxed game with decoy credentials to see what it actually takes',
+      'Reputation verification against Modrinth and GitHub fingerprints',
+      'Findings are discounted for properly built, signed mod packages, cutting false positives',
+    ],
   },
   {
     version: 'v1.9.0',

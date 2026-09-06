@@ -4,6 +4,7 @@ import { Link, NavLink } from 'react-router-dom'
 const links = [
   { to: '/how-it-works', label: 'How it works' },
   { to: '/detection', label: 'Detection' },
+  // Temporarily unlinked while /security-tools is rolled back — see App.jsx.
   { to: '/team', label: 'Team' },
   { to: '/version', label: 'Version' },
   { to: '/privacy', label: 'Privacy' },

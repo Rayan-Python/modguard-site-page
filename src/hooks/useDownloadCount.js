@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-
-const REPO = 'Rayan-Python/modguard-site-page'
+import { GITHUB_REPO as REPO } from '../data/release.js'
 
 export default function useDownloadCount() {
   const [count, setCount] = useState(null)
