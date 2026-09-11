@@ -3,11 +3,23 @@
  * ModGuard 1.32.0 uses in dist/main/checker-worker.cjs, ported verbatim.
  *
  * The desktop app scores 28 behaviour categories. This browser build reaches
- * every one of them that can be decided from the file alone; the three that
- * need the live sandbox (RUNS_UNCHECKED_CODE's proven data flow,
- * CHECKS_IF_IT_IS_WATCHED, HAS_A_HOLE_SOMEBODY_COULD_USE) stay in the app, and
- * so does the hash/reputation lookup. Weights and rules are not re-tuned here:
- * a score from this file means the same thing it means in the app.
+ * every one of them that can be decided from the file alone; RUNS_UNCHECKED_CODE
+ * still needs the live sandbox to prove its data flow, and so does the
+ * hash/reputation lookup. CHECKS_IF_IT_IS_WATCHED and HAS_A_HOLE_SOMEBODY_COULD_USE
+ * are now decided statically here.
+ *
+ * Where this build has diverged from the app, and why:
+ *   HAS_A_HOLE_SOMEBODY_COULD_USE  0 -> 35  it was scored at zero, so the finding
+ *                                           was raised and then counted for
+ *                                           nothing; BleedingPipe is a real way in
+ *   DISABLES_YOUR_PROTECTION      45 -> 60  no mod has an honest reason to add a
+ *                                           Defender exclusion, so it stands alone
+ *   STARTS_AUTOMATICALLY          26 -> 32  likewise for autorun keys; it sat just
+ *                                           under the band it belongs in
+ *   ACTS_AS_JAVA_AGENT      now discounted  spark, authlib-injector and
+ *                                           JvmDowngrader are all Java agents
+ * and two categories are new: STRIPS_CODE_SIGNATURES and USES_BLOCKCHAIN_C2.
+ * Re-sync these with the app before trusting the two scores to match.
  */
 
 export const CATEGORIES = {
@@ -62,12 +74,16 @@ export const CATEGORIES = {
     plain: 'it carries a name published as belonging to one particular malware campaign',
   },
   STARTS_AUTOMATICALLY: {
-    weight: 26,
+    // A mod is loaded by the game, so it never needs the machine to start it.
+    // Naming an autorun key is enough on its own to be worth a second look.
+    weight: 32,
     title: 'Sets itself to start automatically or stick around',
-    plain: 'it references autorun keys, startup folders or scheduled tasks',
+    plain: 'it references autorun keys, startup folders or scheduled tasks, which a mod has no reason to touch',
   },
   DISABLES_YOUR_PROTECTION: {
-    weight: 45,
+    // Nothing a mod legitimately does involves adding a Defender exclusion, so
+    // this stands on its own rather than waiting for a second signal.
+    weight: 60,
     title: 'Tells your antivirus to stop looking',
     plain: "it runs a command that switches off part of your computer's own protection",
   },
@@ -122,9 +138,23 @@ export const CATEGORIES = {
     plain: 'it reads your Minecraft session token',
   },
   HAS_A_HOLE_SOMEBODY_COULD_USE: {
-    weight: 0,
+    // A hole is not an intent, so this lands at "worth a closer look" on its own
+    // rather than at "malicious": the mod is vulnerable, not hostile. It carries
+    // weight without corroboration because the BleedingPipe pattern is a real
+    // remote-code-execution route that needs no other signal to be exploitable.
+    weight: 35,
     title: 'Has a weakness somebody else could use against you',
-    plain: 'it rebuilds Java objects out of data that arrived over the network',
+    plain: 'it rebuilds Java objects out of data that arrived over the network, which is a way in for whoever sends it',
+  },
+  STRIPS_CODE_SIGNATURES: {
+    weight: 60,
+    title: "Removes the signatures that prove a jar wasn't altered",
+    plain: 'it deletes the signing files that would show a jar had been tampered with',
+  },
+  USES_BLOCKCHAIN_C2: {
+    weight: 60,
+    title: 'Takes its orders from the blockchain',
+    plain: 'it reads its next instruction out of a blockchain contract and checks the answer against a built-in key',
   },
   PRETENDS_TO_BE_A_SCHEMATIC: {
     weight: 40,
@@ -172,6 +202,11 @@ const DISCOUNTABLE = [
   'ASKS_EXTRA_ACCESS',
   'RUNS_KNOWN_HELPER',
   'ACTS_AS_YOU_IN_GAME',
+  // A Java agent is how spark profiles the game, how authlib-injector redirects
+  // authentication and how JvmDowngrader runs newer code on older Java. On its
+  // own in a well-built mod it is a fact about packaging, not a finding; paired
+  // with anything else here it stops being discounted and counts in full.
+  'ACTS_AS_JAVA_AGENT',
 ]
 
 const isDiscountable = (category) => DISCOUNTABLE.includes(category)
@@ -200,6 +235,11 @@ export const COMBOS = [
     categories: ['INDIRECT_CODE_LOADING', 'REACHES_INTERNET'],
     extraWeight: 15,
     reason: "Can download and run extra code from the internet that isn't in the file you checked.",
+  },
+  {
+    categories: ['INDIRECT_CODE_LOADING', 'HIDES_ITS_CODE'],
+    extraWeight: 20,
+    reason: 'Loads code at runtime and hides how it does it. A mod loader does the first openly; hiding the second half is what a dropper does.',
   },
   {
     categories: ['RUNS_UNCHECKED_CODE', 'REACHES_INTERNET'],
@@ -234,6 +274,34 @@ export const COMBOS = [
     reason: 'Starts programs and sets itself up to keep running. That is the behaviour of an installer, not a mod.',
   },
   {
+    categories: ['READS_YOUR_SESSION', 'REACHES_INTERNET'],
+    extraWeight: 25,
+    theftPattern: true,
+    reason: 'Reads the key that proves you are you, and also talks to the internet. Those two together are how a Minecraft account is taken.',
+  },
+  {
+    categories: ['READS_YOUR_SESSION', 'INDIRECT_CODE_LOADING'],
+    extraWeight: 20,
+    theftPattern: true,
+    reason: 'Reads your session key in the same file that loads code it did not ship with.',
+  },
+  {
+    categories: ['READS_YOUR_SESSION', 'TOUCHES_SENSITIVE_FILES'],
+    extraWeight: 25,
+    theftPattern: true,
+    reason: 'Reads both your session key and the files your logins are saved in.',
+  },
+  {
+    categories: ['LOADS_NATIVE_CODE', 'REACHES_INTERNET'],
+    extraWeight: 20,
+    reason: 'Loads native code with full system access, and fetches from the internet in the same file.',
+  },
+  {
+    categories: ['CHECKS_IF_IT_IS_WATCHED', 'REACHES_INTERNET'],
+    extraWeight: 20,
+    reason: 'Checks whether it is being examined before it reaches the internet — behaviour aimed at staying unseen rather than at working well.',
+  },
+  {
     categories: ['CARRIES_A_PROGRAM', 'RUNS_OTHER_PROGRAMS'],
     extraWeight: 20,
     reason: 'Carries a program inside it and can start programs. Between them, everything needed to install something on your computer is already in this file.',
@@ -249,7 +317,16 @@ export const COMBOS = [
 // ordinary-but-noisy behaviour is never on its own proof of malice.
 const CAP_ORDINARY = 49
 const CAP_ESCALATED = 99
-const ALWAYS_ESCALATES = ['RUNS_UNCHECKED_CODE', 'HIDES_AN_EXECUTABLE', 'DISABLES_YOUR_PROTECTION']
+// Behaviours with no legitimate counterpart in a mod. Each is a complete finding
+// by itself, so none of them waits for a second signal to clear the cap.
+const ALWAYS_ESCALATES = [
+  'RUNS_UNCHECKED_CODE',
+  'HIDES_AN_EXECUTABLE',
+  'DISABLES_YOUR_PROTECTION',
+  'STRIPS_CODE_SIGNATURES',
+  'USES_BLOCKCHAIN_C2',
+  'HAS_A_HOLE_SOMEBODY_COULD_USE',
+]
 
 function scoreCap(firedCombos, categories, provenTampering) {
   if (provenTampering) return CAP_ESCALATED

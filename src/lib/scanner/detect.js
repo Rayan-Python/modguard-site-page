@@ -12,16 +12,22 @@
 
 import { asText } from './archive.js'
 import { matchCampaigns } from './campaigns.js'
-import { spawnCallSites } from './classfile.js'
+import { spawnCallSites, stringsBuiltFromArrays } from './classfile.js'
 import { entropyBlobs, hiddenStrings } from './obfuscation.js'
 import { analyseCommandLine, categoryForCommandLine, describeCommandLine } from './process.js'
 import {
+  BLOCKCHAIN_RPC,
   CHAT_PACKET_NAMES,
   CHAT_SEND_METHODS,
+  COMPRESSION_CLASSES,
+  DEFENDER_TOKENS,
   DROP_METHODS,
   FILE_CLASSES,
   FILE_READ_CLASSES,
   FILE_READ_METHODS,
+  FILE_WRITE_CLASSES,
+  FILE_WRITE_METHODS,
+  GENERIC_MOD_IDS,
   HARDCODED_COMMANDS,
   INDIRECT_LOADER_CLASSES,
   INSTRUMENTATION_CLASSES,
@@ -32,6 +38,7 @@ import {
   JAVA_TOOL_OPTIONS,
   LAUNCH_COMMAND_LINE,
   LAUNCH_CONFIG_NAMES,
+  MINECRAFT_PRESENCE_MARKERS,
   NATIVE_EXTENSIONS,
   NETWORK_CLASSES,
   OUTSIDE_PATHS,
@@ -41,7 +48,12 @@ import {
   PROGRAM_EXTENSIONS,
   REFLECTION_METHODS,
   REFLECTION_TARGETS,
+  SANDBOX_MARKERS,
   SENSITIVE_FILES,
+  SIGNATURE_FILE_TARGETS,
+  SIGNATURE_STRIP_METHODS,
+  SIGNATURE_VERIFY_CLASSES,
+  TEMP_FILE_MARKERS,
   URL_FETCH_METHODS,
   UNSAFE_CLASSES,
   classifyHost,
@@ -50,8 +62,10 @@ import {
   extractUrls,
   isChatPacket,
   isItemPacket,
+  isModLoadingPackage,
   isRoutineUnsafeUse,
   publicIpAddress,
+  readsAccountIdentity,
   readsSessionToken,
   sendsOneLineOfText,
   sendsPacket,
@@ -136,6 +150,22 @@ const usesReflection = (cls) =>
     REFLECTION_METHODS.some((entry) => entry.owner === ref.owner && entry.names.includes(ref.name)),
   ) || cls.methodRefs.some((ref) => ref.name === 'setAccessible')
 
+/**
+ * Can this class put a line of text into the server as you? It gates the
+ * command fragments that mean nothing on their own — a constant reading "pay "
+ * is a word until it sits next to the machinery that sends it.
+ */
+const typesIntoChat = (cls) =>
+  cls.methodRefs.some(
+    (ref) =>
+      sendsOneLineOfText(ref) ||
+      sendsPacket(ref) ||
+      CHAT_SEND_METHODS.some((entry) => entry.owner.test(ref.owner) && entry.names.includes(ref.name)),
+  ) ||
+  cls.referencedClasses.some(
+    (name) => CHAT_PACKET_NAMES.includes(name.split('/').at(-1) ?? name) || isChatPacket(name),
+  )
+
 const buildsInstanceOf = (cls, owner) => {
   const descriptor = `L${owner};`
   return (
@@ -217,17 +247,207 @@ function inGameActions(cls, findings, origin) {
   }
 }
 
+const CLASS_LOADER_NAMES = /ClassLoader$/
+const BYTECODE_SOURCES = new Set([
+  'java/util/jar/JarInputStream',
+  'java/util/zip/ZipInputStream',
+  'java/util/jar/JarFile',
+  'java/util/zip/ZipFile',
+])
+
+/**
+ * The behaviours that published campaigns are actually built out of.
+ *
+ * Each one is written to need the whole shape rather than any single API, because
+ * every API involved has an honest user: Mixin subclasses ClassLoader, spark
+ * loads a native profiler, a server-list mod reads servers.dat. What none of them
+ * do is the combination.
+ */
+function campaignBehaviours(cls, findings, origin, context) {
+  const name = dotted(cls.className)
+  const note = origin.note
+  const referenced = new Set(cls.referencedClasses)
+  const { network, loadsCodeIndirectly, readsSession, corroborated } = context
+  const isLoaderLibrary = isModLoadingPackage(cls.className)
+
+  // 1. A string assembled out of a byte array, feeding something that loads code.
+  //    In a static initialiser it runs the moment the class is touched, which is
+  //    how a loader hides its address from anyone reading the strings.
+  // The bytecode walk is the expensive part, so it only runs for the classes
+  // where its answer could matter.
+  if (!isLoaderLibrary && loadsCodeIndirectly) {
+    const built = stringsBuiltFromArrays(cls)
+    if (built.length > 0) {
+      const inStaticInit = built.filter((site) => site.isStaticInitialiser)
+      findings.add(
+        'HIDES_ITS_CODE',
+        inStaticInit.length > 0
+          ? `${name} builds its text out of raw byte arrays in a static initialiser — code that runs the moment the class is touched — and the same class loads code at runtime${note}`
+          : `${name} builds its text out of raw byte arrays rather than writing it down, in a class that also loads code at runtime (in ${built[0]?.from ?? '?'}())${note}`,
+        origin,
+      )
+      findings.add(
+        'INDIRECT_CODE_LOADING',
+        `${name} loads code whose address is assembled at runtime rather than written in the file${note}`,
+        origin,
+      )
+    }
+  }
+
+  // 2. Who you are, next to something that would carry it away. Reading your name
+  //    is ordinary; reading it in a file that is already taking your session or
+  //    your logins is part of the same collection.
+  if (readsSession || context.readsCredentialFiles) {
+    const identity = cls.methodRefs.filter(readsAccountIdentity)
+    if (identity.length > 0) {
+      findings.add(
+        'READS_YOUR_SESSION',
+        `${name} also reads your account name and id (${dotted(identity[0]?.owner ?? '')}.${identity[0]?.name ?? ''})${note}`,
+        origin,
+      )
+    }
+  }
+
+  // 3. A classloader of its own that takes bytecode from the network or from
+  //    bytes inside the jar, rather than from the classpath.
+  if (!isLoaderLibrary) {
+    const isClassLoader =
+      (cls.superClassName !== null && CLASS_LOADER_NAMES.test(cls.superClassName)) ||
+      cls.interfaces.some((entry) => CLASS_LOADER_NAMES.test(entry))
+    const definesClasses = cls.methodRefs.some((ref) => ref.name === 'defineClass')
+    const fromBytes =
+      cls.referencedClasses.some((referencedName) => BYTECODE_SOURCES.has(referencedName)) ||
+      cls.methodRefs.some((ref) => ref.name === 'getResourceAsStream')
+    if ((isClassLoader || definesClasses) && (network || fromBytes)) {
+      findings.add(
+        'INDIRECT_CODE_LOADING',
+        `${name} is a classloader of its own that takes bytecode from ${network ? 'the network' : 'bytes stored inside the jar'} rather than from the game's own classpath${note}`,
+        origin,
+      )
+    }
+  }
+
+  // 4. Unpacking bytes to a temporary file and loading them as native code.
+  const loadsNative = cls.methodRefs.some(
+    (ref) => (ref.owner === 'java/lang/System' || ref.owner === 'java/lang/Runtime') && (ref.name === 'load' || ref.name === 'loadLibrary'),
+  )
+  if (loadsNative) {
+    const toTemp = cls.stringConstants.some((constant) => TEMP_FILE_MARKERS.some((marker) => marker.test(constant))) ||
+      cls.methodRefs.some((ref) => ref.name === 'createTempFile')
+    const writesFile =
+      cls.referencedClasses.some((referencedName) => FILE_WRITE_CLASSES.has(referencedName)) ||
+      cls.methodRefs.some((ref) => ref.owner === 'java/nio/file/Files' && FILE_WRITE_METHODS.has(ref.name))
+    const compressed = cls.referencedClasses.some((referencedName) => COMPRESSION_CLASSES.has(referencedName))
+    // Unpacking a bundled native to a temp file and loading it is what LWJGL and
+    // every mod that ships a native does, so the extraction itself says nothing.
+    // What says something is where the bytes came from: fetched while the game
+    // runs, or squeezed through a compressor so the file cannot be read as it
+    // sits. Neither is how an honest native ships.
+    const opaqueSource = network || compressed
+    if (toTemp && writesFile && opaqueSource && origin.kind !== 'bundled-library') {
+      const source = network ? 'fetched while the game runs' : 'unpacked from compressed bytes rather than shipped as a plain library'
+      findings.add(
+        'LOADS_NATIVE_CODE',
+        `${name} writes a native library to a temporary file, ${source}, and loads it — code that runs outside Java with no sandbox around it${note}`,
+        origin,
+      )
+      findings.add(
+        'HIDES_ITS_CODE',
+        `${name} carries the native code it runs in a form that cannot be read from the file as it sits (${network ? 'fetched at runtime' : 'compressed'})${note}`,
+        origin,
+      )
+    }
+  }
+
+  // 5. Telling the antivirus to look away. Read from the strings as well as from
+  //    a command line, because the command is often assembled a piece at a time.
+  for (const constant of cls.stringConstants) {
+    for (const { token, says } of DEFENDER_TOKENS) {
+      if (token.test(constant)) {
+        findings.add('DISABLES_YOUR_PROTECTION', `${name} ${says} ("${clip(constant, 70)}")${note}`, origin)
+      }
+    }
+  }
+
+  // 6. Deleting the files that prove a jar has not been altered.
+  const deletes = cls.methodRefs.some(
+    (ref) =>
+      SIGNATURE_STRIP_METHODS.has(ref.name) &&
+      (FILE_CLASSES.has(ref.owner) || ref.owner === 'java/nio/file/Files' || ref.owner.includes('Zip') || ref.owner.includes('Jar')),
+  )
+  for (const constant of cls.stringConstants) {
+    for (const entry of SIGNATURE_FILE_TARGETS) {
+      if (!entry.pattern.test(constant)) continue
+      findings.add(
+        'STRIPS_CODE_SIGNATURES',
+        `${name} ${deletes ? 'deletes' : 'singles out'} ${entry.describe} ("${clip(constant, 60)}") — what is removed to stop a tampered jar looking tampered with${note}`,
+        origin,
+      )
+    }
+  }
+
+  // 8. Orders read off a blockchain, checked against a key only the operator has.
+  const verifiesSignature = cls.referencedClasses.some((referencedName) => SIGNATURE_VERIFY_CLASSES.has(referencedName))
+  for (const constant of cls.stringConstants) {
+    for (const entry of BLOCKCHAIN_RPC) {
+      if (!entry.pattern.test(constant)) continue
+      if (entry.requiresCorroboration === true && !(network && verifiesSignature)) continue
+      findings.add(
+        'USES_BLOCKCHAIN_C2',
+        `${name} reads ${entry.describe} ("${clip(constant, 60)}")${verifiesSignature ? ', and checks the answer against a key built into the file' : ''} — a way to change where a mod takes its orders from without changing the mod${note}`,
+        origin,
+      )
+    }
+  }
+
+  // 9. Deciding whether the machine is a real player's before doing anything.
+  for (const constant of cls.stringConstants) {
+    for (const entry of SANDBOX_MARKERS) {
+      if (!entry.pattern.test(constant)) continue
+      if (entry.requiresCorroboration === true && !corroborated) continue
+      findings.add(
+        'CHECKS_IF_IT_IS_WATCHED',
+        `${name} looks for ${entry.describe} ("${clip(constant, 60)}") — a check that tells an analysis machine from a player's${note}`,
+        origin,
+      )
+    }
+  }
+  // Gating behaviour on the game actually being present is the same check by
+  // another route, and only means anything next to something worth gating.
+  if (corroborated) {
+    for (const constant of cls.stringConstants) {
+      if (MINECRAFT_PRESENCE_MARKERS.some((marker) => marker.test(constant))) {
+        findings.add(
+          'CHECKS_IF_IT_IS_WATCHED',
+          `${name} checks that the game is really installed before going further ("${clip(constant, 60)}") — which is also how a file avoids acting inside a sandbox that has no Minecraft in it${note}`,
+          origin,
+        )
+        break
+      }
+    }
+  }
+}
+
 function analyseClass(unit, findings, hidesItsCode) {
   const { cls, origin } = unit
   const name = dotted(cls.className)
   const note = origin.note
   const referenced = new Set(cls.referencedClasses)
+  const chatSender = typesIntoChat(cls)
 
   // A hole rather than an intent: deserialising network data into live objects.
+  // This is the BleedingPipe shape, and it needs no second signal — rebuilding
+  // objects out of anything a stranger can send is a way in by itself.
   if (referenced.has(OBJECT_INPUT_STREAM) && cls.methodRefs.some((ref) => ref.owner === OBJECT_INPUT_STREAM && ref.name === 'readObject')) {
     const alongside = cls.referencedClasses.find((other) => NETWORK_BUFFER_HINTS.some((hint) => other.includes(hint)))
-    if (alongside !== undefined) {
-      findings.add('HAS_A_HOLE_SOMEBODY_COULD_USE', `${name} rebuilds Java objects out of data that arrived over the network${note}`, origin)
+    const overASocket = cls.referencedClasses.some((other) => NETWORK_CLASSES.has(other))
+    if (alongside !== undefined || overASocket) {
+      const where = alongside !== undefined ? dotted(alongside) : 'a network socket'
+      findings.add(
+        'HAS_A_HOLE_SOMEBODY_COULD_USE',
+        `${name} rebuilds Java objects out of data that arrived over the network (${where}) — whoever sends the data chooses which code runs${note}`,
+        origin,
+      )
     }
   }
 
@@ -263,10 +483,22 @@ function analyseClass(unit, findings, hidesItsCode) {
     cls.referencedClasses.some((referencedName) => FILE_READ_CLASSES.has(referencedName)) ||
     cls.methodRefs.some((ref) => ref.owner === 'java/nio/file/Files' && FILE_READ_METHODS.has(ref.name))
 
+  // What else in this class could carry something off the machine. It is the
+  // gate on the entries that are ordinary on their own — your server list is
+  // your server list until it is being read next to a socket.
+  const loadsCodeIndirectly =
+    cls.referencedClasses.some((referencedName) => INDIRECT_LOADER_CLASSES.has(referencedName)) ||
+    cls.methodRefs.some((ref) => ref.name === 'defineClass')
+  const readsSession = cls.methodRefs.some(readsSessionToken)
+  const corroborated = network || loadsCodeIndirectly || readsSession
+  let readsCredentialFiles = false
+
   for (const constant of cls.stringConstants) {
     for (const entry of SENSITIVE_FILES) {
       if (!entry.pattern.test(constant)) continue
       if (entry.requiresRead === true && !readsFiles) continue
+      if (entry.requiresCorroboration === true && !corroborated) continue
+      readsCredentialFiles = true
       findings.add('TOUCHES_SENSITIVE_FILES', `${name} references ${entry.describe} ("${clip(constant, 60)}")${note}`, origin)
     }
     if (touchesFiles) {
@@ -277,11 +509,12 @@ function analyseClass(unit, findings, hidesItsCode) {
       }
     }
     for (const entry of PERSISTENCE) {
-      if (entry.pattern.test(constant)) {
-        findings.add('STARTS_AUTOMATICALLY', `${name} references ${entry.describe} ("${clip(constant, 60)}")${note}`, origin)
-      }
+      if (!entry.pattern.test(constant)) continue
+      if (entry.requiresCorroboration === true && !(corroborated || touchesFiles)) continue
+      findings.add('STARTS_AUTOMATICALLY', `${name} references ${entry.describe} ("${clip(constant, 60)}")${note}`, origin)
     }
     for (const entry of HARDCODED_COMMANDS) {
+      if (entry.requiresChatSend === true && !chatSender) continue
       if (entry.pattern.test(constant.trim())) {
         findings.add(entry.category, `${name} contains ${entry.describe} ("${clip(constant, 60)}")${note}`, origin)
       }
@@ -298,6 +531,13 @@ function analyseClass(unit, findings, hidesItsCode) {
 
   extraAccess(cls, findings, origin)
   inGameActions(cls, findings, origin)
+  campaignBehaviours(cls, findings, origin, {
+    network,
+    loadsCodeIndirectly,
+    readsSession,
+    readsCredentialFiles,
+    corroborated,
+  })
 
   // Strings written in a form meant not to be read, and what they turned out to say.
   for (const hidden of hiddenStrings(cls.stringConstants)) {
@@ -308,6 +548,7 @@ function analyseClass(unit, findings, hidesItsCode) {
       }
     }
     for (const entry of HARDCODED_COMMANDS) {
+      if (entry.requiresChatSend === true && !chatSender) continue
       if (entry.pattern.test(hidden.decoded.trim())) {
         findings.add(entry.category, `${name} hides ${entry.describe} ("${clip(hidden.decoded, 50)}")${note}`, origin)
       }
@@ -464,6 +705,19 @@ export function detectBehaviours({ archive, manifest, units, unreadableClassPath
   // Hidden code changes how a command line is read, so it is settled first.
   const hidesItsCode = units.some((unit) => hiddenStrings(unit.cls.stringConstants).length > 0)
   for (const unit of units) analyseClass(unit, findings, hidesItsCode)
+
+  // A name that describes nothing, on a file that loads code it did not ship
+  // with. Either half is unremarkable — plenty of small mods have plain names,
+  // and mod loaders load code for a living — but a loader that also declined to
+  // say what it is has made two choices in the same direction.
+  const declaredId = (manifest.id ?? '').toLowerCase()
+  if (GENERIC_MOD_IDS.has(declaredId) && findings.has('INDIRECT_CODE_LOADING')) {
+    findings.add(
+      'HIDES_ITS_CODE',
+      `The mod calls itself "${manifest.id}", a name that says nothing about what it does, and loads code at runtime that is not in this file`,
+      null,
+    )
+  }
 
   const ownClasses = units.filter((unit) => unit.origin.kind === 'mod-own' || unit.origin.kind === 'unattributed')
   if (ownClasses.length >= 4) {

@@ -282,6 +282,50 @@ function* walk(code) {
   }
 }
 
+/**
+ * Every method call this class makes, tagged with the method it was made from.
+ *
+ * The constant pool says a class calls something; it cannot say from where. Some
+ * findings turn on exactly that — a string assembled out of a byte array means
+ * one thing in a decoder and another in a static initialiser that runs the
+ * moment the class is touched — so this walks the code to attribute each call.
+ */
+export function callSites(cls) {
+  const sites = []
+  for (const method of cls.methods) {
+    if (method.code === null) continue
+    for (const instruction of walk(method.code)) {
+      if (instruction.op < 0xb6 || instruction.op > 0xb9) continue
+      const entry = cls.pool[instruction.index]
+      if (entry === undefined || (entry.tag !== 10 && entry.tag !== 11)) continue
+      try {
+        const owner = normaliseClassName(cls.utf(cls.pool[entry.classIndex].nameIndex))
+        if (owner === null) continue
+        sites.push({
+          from: method.name,
+          isStaticInitialiser: method.name === '<clinit>',
+          owner,
+          name: cls.utf(cls.pool[entry.nameAndTypeIndex].nameIndex),
+          descriptor: cls.utf(cls.pool[entry.nameAndTypeIndex].descriptorIndex),
+        })
+      } catch {
+        /* a call we cannot read is not one we can claim to have read */
+      }
+    }
+  }
+  return sites
+}
+
+/** Strings built out of a byte or char array, and the method that built them. */
+export function stringsBuiltFromArrays(cls) {
+  return callSites(cls).filter(
+    (site) =>
+      site.owner === 'java/lang/String' &&
+      site.name === '<init>' &&
+      (site.descriptor.startsWith('([B') || site.descriptor.startsWith('([C')),
+  )
+}
+
 const SPAWN_CALLS = [
   { owner: 'java/lang/Runtime', name: 'exec', api: 'java.lang.Runtime.exec' },
   { owner: 'java/lang/ProcessBuilder', name: '<init>', api: 'java.lang.ProcessBuilder' },

@@ -12,3 +12,4 @@ public/*.dmg
 .env
 .env.local
 .env.*.local
+temp-comparison/

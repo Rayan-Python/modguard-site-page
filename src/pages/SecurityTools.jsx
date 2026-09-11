@@ -1,140 +1,25 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
+import RiskGauge from '../components/RiskGauge.jsx'
 import Seo from '../components/Seo.jsx'
-import { scanFile } from '../lib/modScanner.js'
+import ToolDisclaimer from '../components/ToolDisclaimer.jsx'
+import { scanNativeFile } from '../lib/nativeScanner.js'
 import { checkUrl } from '../lib/urlChecker.js'
 
-const VERDICT_CLASS = {
-  Safe: 'tool__verdict--safe',
-  Suspicious: 'tool__verdict--sus',
-  'Suspicious/Flagged': 'tool__verdict--sus',
-  Malicious: 'tool__verdict--bad',
-}
-
-function Verdict({ verdict, explanation, children }) {
+/**
+ * Every tool reports the same way: the dial, the verdict, one line of why, then
+ * whatever detail that tool can add. A result with no score at all — an
+ * unreadable file, a string that is not a URL — skips the dial and just says so.
+ */
+function Result({ verdict, riskScore, explanation, unit, children }) {
   return (
     <div className="tool__result">
-      {verdict && (
-        <span className={`tool__verdict ${VERDICT_CLASS[verdict] ?? ''}`}>{verdict}</span>
+      {riskScore === null || riskScore === undefined ? (
+        <p className="tool__explanation">{explanation}</p>
+      ) : (
+        <RiskGauge score={riskScore} verdict={verdict} description={explanation} unit={unit} />
       )}
-      <p className="tool__explanation">{explanation}</p>
       {children}
     </div>
-  )
-}
-
-const VERDICT_TONE = {
-  Safe: 'tool__verdict--safe',
-  Suspicious: 'tool__verdict--sus',
-  Malicious: 'tool__verdict--bad',
-}
-
-function RiskScore({ verdict, riskScore }) {
-  if (riskScore === null) return null
-  return (
-    <div className="tool__score">
-      <div className="tool__score-head">
-        <span className={`tool__verdict ${VERDICT_TONE[verdict] ?? ''}`}>{verdict}</span>
-        <span className="tool__score-value">
-          <strong>{riskScore}</strong>
-          <span className="tool__score-max"> / 100</span>
-        </span>
-      </div>
-      <div
-        className="tool__meter"
-        role="img"
-        aria-label={`Risk score ${riskScore} out of 100: ${verdict}`}
-      >
-        <span
-          className={`tool__meter-fill ${VERDICT_TONE[verdict] ?? ''}`}
-          style={{ width: `${Math.max(2, riskScore)}%` }}
-        />
-      </div>
-    </div>
-  )
-}
-
-function ModScanner() {
-  const [file, setFile] = useState(null)
-  const [result, setResult] = useState(null)
-  const [busy, setBusy] = useState(false)
-  const inputRef = useRef(null)
-
-  async function handleScan() {
-    if (!file) return
-    setBusy(true)
-    setResult(null)
-    try {
-      const bytes = new Uint8Array(await file.arrayBuffer())
-      setResult(await scanFile(bytes, file.name))
-    } catch (error) {
-      setResult({
-        verdict: null,
-        riskScore: null,
-        reasons: [],
-        explanation: `This file could not be read: ${error?.message ?? error}`,
-      })
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <section className="tool">
-      <h2 className="tool__heading">Mod scanner</h2>
-      <p className="tool__lede">
-        Upload a <code>.jar</code> or a schematic. ModGuard reads the class files, the
-        archive itself and the nested jars inside it, then scores what it finds on the same
-        weighted categories the desktop app uses. Nothing leaves your browser.
-      </p>
-
-      <div className="tool__row">
-        <input
-          ref={inputRef}
-          id="mod-file"
-          type="file"
-          accept=".jar,.zip,.litematic,.schem,.schematic,.nbt"
-          className="tool__file"
-          onChange={(event) => {
-            setFile(event.target.files?.[0] ?? null)
-            setResult(null)
-          }}
-        />
-        <label htmlFor="mod-file" className="tool__file-label">
-          {file ? file.name : 'Choose a file'}
-        </label>
-        <button
-          type="button"
-          className="tool__submit"
-          onClick={handleScan}
-          disabled={!file || busy}
-        >
-          {busy ? 'Scanning…' : 'Scan'}
-        </button>
-      </div>
-
-      {result && (
-        <div className="tool__result">
-          <RiskScore verdict={result.verdict} riskScore={result.riskScore ?? null} />
-          <p className="tool__explanation">{result.explanation}</p>
-          {result.reasons?.length > 0 && (
-            <ul className="tool__signals">
-              {result.reasons.map((reason) => (
-                <li className="tool__signal" key={reason.title + reason.text}>
-                  <span className="tool__signal-check">{reason.title}</span>
-                  <span className="tool__signal-detail">{reason.text}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      <p className="tool__note">
-        The score and the reasons above are the headline. The full findings list, the file's
-        fingerprint and its reputation against known-good and known-bad builds stay in the
-        desktop app, along with the sandbox that watches a mod actually run.
-      </p>
-    </section>
   )
 }
 
@@ -189,20 +74,122 @@ function UrlChecker() {
       </div>
 
       {result && (
-        <Verdict verdict={result.verdict} explanation={result.explanation}>
+        <Result
+          verdict={result.verdict}
+          riskScore={result.riskScore ?? null}
+          explanation={result.explanation}
+          unit="Link risk score"
+        >
           {result.host && <p className="tool__host">Checked: {result.host}</p>}
           {result.notes?.map((note) => (
             <p className="tool__note" key={note}>
               {note}
             </p>
           ))}
-        </Verdict>
+        </Result>
       )}
 
       <p className="tool__note">
-        This checks against known threat databases and common patterns. Always verify
-        suspicious links independently.
+        This checks against known threat databases and common patterns, including the
+        "free robux / V-Bucks" giveaway pages that ask for a game login where a real
+        purchase would ask for a payment.
       </p>
+      <ToolDisclaimer />
+    </section>
+  )
+}
+
+function NativeScanner() {
+  const [file, setFile] = useState(null)
+  const [result, setResult] = useState(null)
+  const [busy, setBusy] = useState(false)
+
+  async function handleScan() {
+    if (!file) return
+    setBusy(true)
+    setResult(null)
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      setResult(await scanNativeFile(bytes, file.name))
+    } catch (error) {
+      setResult({
+        verdict: null,
+        riskScore: null,
+        findings: [],
+        explanation: `This file could not be read: ${error?.message ?? error}`,
+      })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <section className="tool">
+      <h2 className="tool__heading">Native mod scanner</h2>
+      <p className="tool__lede">
+        For the games the desktop app does not reach: Red Dead Redemption 2, Cyberpunk 2077,
+        Watch Dogs, Assassin's Creed and the Bethesda titles. Upload a <code>.dll</code>,{' '}
+        <code>.asi</code>, <code>.exe</code> or the archive you downloaded, and ModGuard
+        reads the Windows headers, the strings and any nested archives for the injection,
+        credential-theft and persistence patterns that mod menus and fake trainers are built
+        from. Minecraft and Java mods are the desktop app's job — this is the native side it
+        does not reach. Nothing leaves your browser.
+      </p>
+
+      <div className="tool__row">
+        <input
+          id="native-file"
+          type="file"
+          accept=".dll,.asi,.exe,.zip,.rar,.7z,.archive"
+          className="tool__file"
+          onChange={(event) => {
+            setFile(event.target.files?.[0] ?? null)
+            setResult(null)
+          }}
+        />
+        <label htmlFor="native-file" className="tool__file-label">
+          {file ? file.name : 'Choose a file'}
+        </label>
+        <button
+          type="button"
+          className="tool__submit"
+          onClick={handleScan}
+          disabled={!file || busy}
+        >
+          {busy ? 'Scanning…' : 'Scan'}
+        </button>
+      </div>
+
+      {result && (
+        <Result
+          verdict={result.verdict}
+          riskScore={result.riskScore ?? null}
+          explanation={result.explanation}
+          unit="Native file risk score"
+        >
+          {result.game && (
+            <p className="tool__host">Looks like a mod for: {result.game.label}</p>
+          )}
+          {result.findings?.length > 0 && (
+            <ul className="tool__signals">
+              {result.findings.map((finding) => (
+                <li className="tool__signal" key={finding.id + finding.detail}>
+                  <span className="tool__signal-check">{finding.title}</span>
+                  <span className="tool__signal-detail">{finding.detail}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Result>
+      )}
+
+      <p className="tool__note">
+        Mod menus inject into the game by design, so injection on its own is reported rather
+        than condemned. What moves the needle is injection next to something that has nothing
+        to do with modding — reading your saved logins, posting to a webhook, or switching
+        off Defender.
+      </p>
+      <ToolDisclaimer />
     </section>
   )
 }
@@ -211,19 +198,19 @@ export default function SecurityTools() {
   return (
     <section className="doc doc--wide">
       <Seo
-        title="Free Mod Scanner & URL Checker — ModGuard"
-        description="Scan a Minecraft mod .jar or schematic for account stealers, droppers, hidden jars and auto-execute code, and check a download link against Google Safe Browsing and known typosquat patterns. Free, in your browser."
+        title="Native Mod Scanner & URL Checker — ModGuard"
+        description="Scan a .dll, .asi or .exe mod menu for Red Dead Redemption 2, Cyberpunk 2077, Watch Dogs, Assassin's Creed or Skyrim, and check a download link for typosquats and free-currency scams. Free, in your browser."
       />
       <div className="container doc__inner">
         <h1 className="doc__title">Security tools</h1>
         <p className="doc__lede">
-          Two checks you can run right here, on the same detection logic as the desktop
-          app. Neither replaces it — they are the parts that work without installing
-          anything, and without the file ever leaving your browser.
+          Two checks you can run right here, for the things the desktop app does not cover:
+          native mod files for games outside Minecraft, and the link you were about to
+          follow. Neither replaces the app, and neither file ever leaves your browser.
         </p>
 
         <div className="tools">
-          <ModScanner />
+          <NativeScanner />
           <UrlChecker />
         </div>
 

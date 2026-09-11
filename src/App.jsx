@@ -15,8 +15,7 @@ import Team from './pages/Team.jsx'
 import Contact from './pages/Contact.jsx'
 import NotFound from './pages/NotFound.jsx'
 import InternalStats from './pages/InternalStats.jsx'
-// SecurityTools import removed temporarily — /security-tools route is rolled
-// back below while the feature is finished. Component is untouched.
+import SecurityTools from './pages/SecurityTools.jsx'
 
 export default function App() {
   return (
@@ -28,6 +27,7 @@ export default function App() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/detection" element={<Detection />} />
+          <Route path="/security-tools" element={<SecurityTools />} />
           <Route path="/version" element={<Version />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/security" element={<Security />} />

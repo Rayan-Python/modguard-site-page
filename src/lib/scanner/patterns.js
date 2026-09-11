@@ -35,6 +35,17 @@ export const SENSITIVE_FILES = [
   { pattern: /launcher_msa_credentials/i, describe: "the Minecraft launcher's saved Microsoft login" },
   { pattern: /TlauncherProfiles\.json/i, describe: "TLauncher's saved account file" },
   { pattern: /com\.modrinth\.theseus[\\/]profiles\.json/i, describe: "the Modrinth app's saved account file" },
+  { pattern: /microsoft_accounts\.json/i, describe: "a launcher's saved Microsoft account file" },
+  { pattern: /[\\/]?account\.txt(?:[\\/"']|$)/i, describe: 'a saved account file' },
+  { pattern: /(?:prism|multimc|polymc|atlauncher|gdlauncher|modrinth)[\\/][^"]*accounts\.json/i, describe: "a third-party launcher's saved account file" },
+  // The launcher's own credential database, and the Windows vault behind it.
+  { pattern: /[\\/]app\.db(?:[\\/"']|$)/i, describe: "a launcher's local credential database", requiresCorroboration: true },
+  { pattern: /Microsoft[\\/]Credentials(?:[\\/"']|$)/i, describe: "the Windows Credential Manager's stored logins" },
+  { pattern: /\bvaultcmd\b|Credential ?Manager/i, describe: "the Windows Credential Manager" },
+  { pattern: /Microsoft[\\/]Protect(?:[\\/"']|$)/i, describe: "the Windows DPAPI master keys that unlock saved passwords" },
+  // servers.dat is an ordinary file a server-list mod reads for honest reasons,
+  // so it only counts next to something that would carry it off the machine.
+  { pattern: /servers\.dat(?:[\\/"']|$)/i, describe: 'your saved server list', requiresCorroboration: true },
 ]
 
 export const OUTSIDE_PATHS = [
@@ -50,10 +61,16 @@ export const OUTSIDE_PATHS = [
 
 export const PERSISTENCE = [
   { pattern: /CurrentVersion\\+Run/i, describe: 'the Windows autorun registry key' },
+  { pattern: /CurrentVersion[\\/]+Run(?:Once)?\b/i, describe: 'the Windows autorun registry key' },
+  { pattern: /\breg(?:\.exe)?\s+add\b[^"]*\bRun\b/i, describe: 'a command that writes a Windows autorun registry key' },
   { pattern: /Start Menu\\+Programs\\+Startup/i, describe: 'the Windows Startup folder' },
+  { pattern: /Start Menu[\\/]+Programs[\\/]+Startup/i, describe: 'the Windows Startup folder' },
+  { pattern: /shell:startup/i, describe: 'the Windows Startup folder' },
   { pattern: /schtasks/i, describe: 'Windows scheduled tasks' },
   { pattern: /LaunchAgents|LaunchDaemons/, describe: 'macOS auto-start services' },
   { pattern: /crontab|\/etc\/init\.d|systemd/, describe: 'Linux auto-start services' },
+  { pattern: /\/etc\/systemd\/system\/|\.config\/systemd\/user\//, describe: 'a Linux systemd service file' },
+  { pattern: /\.service(?:[\\/"']|$)/, describe: 'a Linux systemd unit file', requiresCorroboration: true },
 ]
 
 // --- in-game commands written into the code ---------------------------------
@@ -63,25 +80,62 @@ export const PERSISTENCE = [
 const NAME = String.raw`[A-Za-z0-9_]{3,16}`
 const AMOUNT = String.raw`\$?\d[\d.,]*\s*[kmbKMB]?`
 
+/**
+ * A value the code fills in as it runs. Compiled Java almost never carries a
+ * finished command line: javac writes `"pay " + who + " " + amount` as an
+ * invokedynamic *recipe* — one constant with U+0001 where each argument goes —
+ * and a StringBuilder chain leaves the prefix as a constant of its own. Reading
+ * only fully literal commands is what let a hardcoded /pay through: the verb was
+ * always hardcoded, and only the arguments were assembled.
+ */
+const FILLED_IN = String.raw`[\u0001\u0002]|%[0-9.]*[sdf]|\{\}|\{\d+\}|\$\{[^}]*\}`
+const NAME_OR_FILLED = `(?:${NAME}|${FILLED_IN})`
+// "all" and "max" are amounts too, and are what a sniper actually sends.
+const AMOUNT_WORD = String.raw`all|max|everything|\*`
+const AMOUNT_OR_FILLED = `(?:${AMOUNT}|${AMOUNT_WORD}|${FILLED_IN})`
+
 const SLASHED = [
   { pattern: /^\/(pay|paytoggle)\b/i, describe: 'a command that pays another player', category: 'CARRIES_A_TRANSFER_COMMAND' },
   { pattern: /^\/(money|bal|balance|eco|economy)\s+(pay|send|give|transfer)/i, describe: 'a command that transfers your balance', category: 'CARRIES_A_TRANSFER_COMMAND' },
   { pattern: /^\/(trade|transfer)\b/i, describe: 'a command that hands over your money or items', category: 'CARRIES_A_TRANSFER_COMMAND' },
-  { pattern: /^\/give\s+[A-Za-z0-9_]{3,16}\s/i, describe: 'a ready-made command that gives items to a named player', category: 'CARRIES_A_TRANSFER_COMMAND' },
+  { pattern: new RegExp(String.raw`^\/give\s+${NAME_OR_FILLED}\s`, 'i'), describe: 'a ready-made command that gives items to a named player', category: 'CARRIES_A_TRANSFER_COMMAND' },
   { pattern: /^\/(withdraw|deposit)\b/i, describe: 'a command that moves your money in or out of a bank', category: 'ACTS_AS_YOU_IN_GAME' },
   { pattern: /^\/(sell|ah|auction|shop)\s/i, describe: 'a command that sells or lists your items', category: 'ACTS_AS_YOU_IN_GAME' },
   { pattern: /^\/(msg|w|tell|whisper)\s/i, describe: 'a command that sends a private message as you', category: 'ACTS_AS_YOU_IN_GAME' },
 ]
 
+// Modern Minecraft takes commands through sendChatCommand *without* the leading
+// slash, so the unslashed spelling is the one a current mod actually carries.
 const BARE = [
-  { pattern: new RegExp(String.raw`^pay\s+${NAME}\s+${AMOUNT}$`, 'i'), describe: 'a ready-made command that pays a named player', category: 'CARRIES_A_TRANSFER_COMMAND' },
-  { pattern: new RegExp(String.raw`^(money|eco|economy|bal|balance)\s+(pay|send|give|transfer)\s+${NAME}\b`, 'i'), describe: 'a ready-made command that transfers your balance to a named player', category: 'CARRIES_A_TRANSFER_COMMAND' },
-  { pattern: new RegExp(String.raw`^transfer\s+${NAME}\s+${AMOUNT}$`, 'i'), describe: 'a ready-made command that transfers money to a named player', category: 'CARRIES_A_TRANSFER_COMMAND' },
-  { pattern: new RegExp(String.raw`^(withdraw|deposit)\s+${AMOUNT}$`, 'i'), describe: 'a ready-made command that moves your money in or out of a bank', category: 'ACTS_AS_YOU_IN_GAME' },
+  { pattern: new RegExp(String.raw`^pay\s+${NAME_OR_FILLED}\s+${AMOUNT_OR_FILLED}$`, 'i'), describe: 'a ready-made command that pays a named player', category: 'CARRIES_A_TRANSFER_COMMAND' },
+  { pattern: new RegExp(String.raw`^(money|eco|economy|bal|balance)\s+(pay|send|give|transfer)\s+${NAME_OR_FILLED}\b`, 'i'), describe: 'a ready-made command that transfers your balance to a named player', category: 'CARRIES_A_TRANSFER_COMMAND' },
+  { pattern: new RegExp(String.raw`^transfer\s+${NAME_OR_FILLED}\s+${AMOUNT_OR_FILLED}$`, 'i'), describe: 'a ready-made command that transfers money to a named player', category: 'CARRIES_A_TRANSFER_COMMAND' },
+  { pattern: new RegExp(String.raw`^give\s+${NAME_OR_FILLED}\s+\S`, 'i'), describe: 'a ready-made command that gives items to a named player', category: 'CARRIES_A_TRANSFER_COMMAND' },
+  { pattern: new RegExp(String.raw`^(withdraw|deposit)\s+${AMOUNT_OR_FILLED}$`, 'i'), describe: 'a ready-made command that moves your money in or out of a bank', category: 'ACTS_AS_YOU_IN_GAME' },
   { pattern: /^(sell|ah|auction)\s+(all|hand|hands|inv|inventory)\b/i, describe: 'a ready-made command that sells what you are carrying', category: 'ACTS_AS_YOU_IN_GAME' },
 ]
 
-export const HARDCODED_COMMANDS = [...SLASHED, ...BARE]
+/**
+ * The verb on its own, as a StringBuilder chain leaves it behind.
+ *
+ * A bare "pay " is a common enough word that it means nothing by itself, so
+ * these only count in a class that also types into chat — the mechanism and the
+ * ready-made transfer command in the same place. That pairing is the red flag,
+ * not either half: an auto-login mod sends a command on join too, and /login
+ * hands nothing to anybody, so it is not in this table at all.
+ */
+const VERB_PREFIX = [
+  { pattern: /^\/?pay\s*$/i, describe: 'the opening of a command that pays another player, with who and how much filled in as it runs', category: 'CARRIES_A_TRANSFER_COMMAND' },
+  { pattern: /^\/?(money|eco|economy)\s+(pay|send|transfer)\s*$/i, describe: 'the opening of a command that transfers your balance, with the rest filled in as it runs', category: 'CARRIES_A_TRANSFER_COMMAND' },
+  { pattern: /^\/?transfer\s*$/i, describe: 'the opening of a command that transfers money, with the rest filled in as it runs', category: 'CARRIES_A_TRANSFER_COMMAND' },
+  { pattern: /^\/?trade\s*$/i, describe: 'the opening of a command that hands over your money or items', category: 'CARRIES_A_TRANSFER_COMMAND' },
+]
+
+export const HARDCODED_COMMANDS = [
+  ...SLASHED,
+  ...BARE,
+  ...VERB_PREFIX.map((entry) => ({ ...entry, requiresChatSend: true })),
+]
 
 // --- the Java APIs each behaviour is made of --------------------------------
 
@@ -158,6 +212,19 @@ const SESSION_METHODS = new Set(['getAccessToken', 'getToken', 'getSessionId', '
 export const readsSessionToken = (ref) =>
   (SESSION_OWNER.test(ref.owner) && SESSION_METHODS.has(ref.name)) ||
   (ref.owner === 'net/minecraft/class_320' && ref.name === 'method_1674')
+
+/**
+ * Who you are, as opposed to the key that proves it.
+ *
+ * Reading your name or UUID is what every scoreboard, chat and cosmetics mod
+ * does, so on its own it is nothing. It is recorded only to say what a file was
+ * collecting once something else in the same file already looks like theft —
+ * never as a finding of its own.
+ */
+const IDENTITY_METHODS = new Set(['getUsername', 'getUuid', 'getUUID', 'getProfile', 'getName', 'getId'])
+export const readsAccountIdentity = (ref) =>
+  (SESSION_OWNER.test(ref.owner) && IDENTITY_METHODS.has(ref.name)) ||
+  (ref.owner === 'net/minecraft/class_320' && ['method_1676', 'method_1677'].includes(ref.name))
 
 export const CHAT_SEND_METHODS = [
   { owner: /^net\/minecraft\/client\/(network|player)\//, names: ['sendChatMessage', 'sendChatCommand', 'sendCommand', 'sendMessage'] },
@@ -297,6 +364,128 @@ export const DEFENDER_TOKENS = [
   { token: /\bMpCmdRun\b/i, says: 'drives Windows Defender from the command line' },
   { token: /\bMsMpEng\b/i, says: "names Windows Defender's own process" },
 ]
+
+// --- stripping the signatures off a jar --------------------------------------
+
+/**
+ * META-INF/*.RSA, *.EC, *.DSA and *.SF are what make a signed jar checkable.
+ * Code that singles them out is code that wants a jar to stop looking altered —
+ * there is no other reason to name them, and reading a jar's entries normally
+ * never involves matching on those suffixes.
+ */
+export const SIGNATURE_FILE_TARGETS = [
+  { pattern: /META-INF[\\/][^"\s]*\.(RSA|DSA|EC|SF)\b/i, describe: "a jar's signature files" },
+  { pattern: /\.(RSA|DSA|EC)$/, describe: "a jar's signing certificate" },
+  { pattern: /\bMETA-INF[\\/]\*\.(RSA|DSA|EC|SF)/i, describe: "every signature file in a jar" },
+]
+export const SIGNATURE_STRIP_METHODS = new Set(['delete', 'deleteIfExists', 'remove', 'removeEntry'])
+
+// --- blockchain command-and-control ------------------------------------------
+
+/**
+ * EtherHiding: the next stage's address is stored in a smart contract and read
+ * with an `eth_call`, so there is no domain to take down. WeedHack pairs it with
+ * an RSA check of the answer, so the operator alone can change it.
+ *
+ * No mod has a reason to speak JSON-RPC to an Ethereum node.
+ */
+export const BLOCKCHAIN_RPC = [
+  { pattern: /"?\beth_call\b"?/i, describe: 'an Ethereum contract call (eth_call)' },
+  { pattern: /\beth_getStorageAt\b|\beth_sendRawTransaction\b/i, describe: 'a direct Ethereum node call' },
+  { pattern: /\bjsonrpc\b["'\s:]*2\.0/i, describe: 'a JSON-RPC request', requiresCorroboration: true },
+  { pattern: /(^|\/\/|\.)(mainnet|sepolia|goerli)\.infura\.io|alchemyapi\.io|\bbinance\.org\/smartchain|bsc-dataseed|polygon-rpc\.com|cloudflare-eth\.com|ankr\.com\/eth/i, describe: 'a public blockchain node endpoint' },
+  { pattern: /\b0x[a-fA-F0-9]{40}\b/, describe: 'an Ethereum contract address', requiresCorroboration: true },
+]
+export const SIGNATURE_VERIFY_CLASSES = new Set([
+  'java/security/Signature',
+  'java/security/spec/X509EncodedKeySpec',
+  'java/security/KeyFactory',
+])
+
+// --- checks that the machine is a real player's ------------------------------
+
+/**
+ * Names that only matter to something deciding whether it is being watched.
+ * Windows Sandbox logs in as WDAGUtilityAccount; the rest are the analysis tools
+ * and virtual-machine services a sandbox has and a player's computer does not.
+ */
+export const SANDBOX_MARKERS = [
+  { pattern: /\bWDAGUtilityAccount\b/i, describe: "the username Windows Sandbox runs as" },
+  { pattern: /\b(wireshark|tcpview|procmon|procexp|processhacker|fiddler|httpdebugger|dumpcap|windbg|ollydbg|x64dbg|ida64|immunitydebugger)(\.exe)?\b/i, describe: 'the name of an analysis tool' },
+  { pattern: /\b(vboxservice|vboxtray|vmtoolsd|vmwaretray|vmwareuser|vmsrvc|vmusrvc|qemu-ga|xenservice)(\.exe)?\b/i, describe: "a virtual machine's own service" },
+  { pattern: /\b(VirtualBox|VMware|QEMU|Xen|Sandboxie|Cuckoo)\b/, describe: 'a virtual machine or sandbox by name', requiresCorroboration: true },
+  { pattern: /\bSbieDll\.dll\b/i, describe: "Sandboxie's own library" },
+]
+
+// Whether the game is really running. Harmless in a mod that needs the client;
+// the tell is a file that will not act until it has checked.
+export const MINECRAFT_PRESENCE_MARKERS = [
+  /net[\\/.]minecraft[\\/.]client[\\/.]main[\\/.]Main/,
+  /\.minecraft[\\/]versions[\\/]/i,
+  /\bMinecraft\.exe\b/i,
+]
+
+// --- unpacking a payload and running it as native code ------------------------
+
+export const TEMP_FILE_MARKERS = [/java\.io\.tmpdir/, /createTempFile/, /\/tmp\//, /%TEMP%/i, /Local[\\/]Temp/i]
+export const COMPRESSION_CLASSES = new Set([
+  'java/util/zip/Inflater',
+  'java/util/zip/InflaterInputStream',
+  'java/util/zip/GZIPInputStream',
+  'org/tukaani/xz/XZInputStream',
+  'org/tukaani/xz/LZMAInputStream',
+  'org/tukaani/xz/LZMA2InputStream',
+  'io/airlift/compress/lzma/LzmaInputStream',
+  'com/github/luben/zstd/ZstdInputStream',
+])
+export const FILE_WRITE_CLASSES = new Set([
+  'java/io/FileOutputStream',
+  'java/io/BufferedOutputStream',
+  'java/io/RandomAccessFile',
+])
+export const FILE_WRITE_METHODS = new Set(['write', 'writeBytes', 'copy', 'newOutputStream', 'transferTo'])
+
+// --- code that loads code, honestly -------------------------------------------
+
+/**
+ * The libraries whose whole job is loading and rewriting classes. A mod that
+ * ships Mixin, ASM, MixinExtras, Sinytra Connector or JvmDowngrader subclasses
+ * ClassLoader and calls defineClass because that is what those libraries do, and
+ * flagging it is how a scanner ends up flagging most of the Fabric ecosystem.
+ */
+export const MOD_LOADING_PACKAGES = [
+  'org/spongepowered/asm',
+  'org/spongepowered/include',
+  'com/llamalad7/mixinextras',
+  'org/objectweb/asm',
+  'net/fabricmc/loader',
+  'net/fabricmc/api',
+  'net/fabricmc/tinyremapper',
+  'net/minecraftforge/fml',
+  'net/neoforged/fml',
+  'cpw/mods/modlauncher',
+  'cpw/mods/cl',
+  'org/quiltmc/loader',
+  'dev/architectury',
+  'org/sinytra',
+  'xyz/wagyourtail/jvmdg',
+  'net/lenni0451/classtransform',
+  'io/github/llamalad7',
+  'org/burningwave',
+  'javassist',
+  'net/bytebuddy',
+  'org/apache/logging',
+]
+export const isModLoadingPackage = (className) =>
+  MOD_LOADING_PACKAGES.some((prefix) => className.startsWith(`${prefix}/`) || className === prefix)
+
+// A mod id that says nothing about what the mod is. WeedHack shipped as
+// "loaderclient"; a real mod's id is its name.
+export const GENERIC_MOD_IDS = new Set([
+  'loaderclient', 'client', 'loader', 'mod', 'main', 'core', 'api', 'test', 'example',
+  'launcher', 'helper', 'utils', 'util', 'lib', 'library', 'plugin', 'addon', 'injector',
+  'bootstrap', 'agent', 'update', 'updater', 'installer', 'optimizer', 'booster',
+])
 
 // --- launcher injection -----------------------------------------------------
 

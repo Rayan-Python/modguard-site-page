@@ -2037,3 +2037,159 @@ main {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ---------------------------------------------------------------------------
+   Risk gauge
+   One dial, shared by the mod scanner, the URL checker and the native scanner.
+   Greys for the dial; the two status colours the tools already use for bands.
+   --------------------------------------------------------------------------- */
+
+.gauge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 26px;
+  margin-bottom: 18px;
+}
+
+.gauge__dial {
+  flex: none;
+  width: 190px;
+}
+
+.gauge__svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.gauge__track {
+  stroke: color-mix(in srgb, var(--ink) 9%, transparent);
+}
+
+/* The bands sit under the fill, dim, so the whole scale stays readable. */
+.gauge__band {
+  opacity: 0.28;
+}
+
+.gauge__band--safe {
+  stroke: var(--ink);
+}
+
+.gauge__band--sus {
+  stroke: #e8c07a;
+}
+
+.gauge__band--bad {
+  stroke: #ff6a5f;
+}
+
+.gauge__fill {
+  transition: d 0.4s ease;
+}
+
+.gauge__fill--safe {
+  stroke: var(--ink);
+}
+
+.gauge__fill--sus {
+  stroke: #e8c07a;
+}
+
+.gauge__fill--bad {
+  stroke: #ff6a5f;
+}
+
+.gauge__needle {
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.gauge__needle--safe,
+.gauge__hub--safe {
+  stroke: var(--ink);
+  fill: var(--ink);
+}
+
+.gauge__needle--sus,
+.gauge__hub--sus {
+  stroke: #e8c07a;
+  fill: #e8c07a;
+}
+
+.gauge__needle--bad,
+.gauge__hub--bad {
+  stroke: #ff6a5f;
+  fill: #ff6a5f;
+}
+
+.gauge__hub {
+  stroke: none;
+}
+
+.gauge__value {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  fill: var(--ink);
+}
+
+.gauge__max {
+  font-size: 0.85rem;
+  fill: color-mix(in srgb, var(--ink) 45%, transparent);
+}
+
+.gauge__readout {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.gauge__verdict {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.gauge__verdict--safe {
+  color: var(--ink);
+}
+
+.gauge__verdict--sus {
+  color: #e8c07a;
+}
+
+.gauge__verdict--bad {
+  color: #ff6a5f;
+}
+
+.gauge__why {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+@media (max-width: 520px) {
+  .gauge {
+    gap: 16px;
+  }
+
+  .gauge__dial {
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
+  }
+}
+
+/* The shared disclaimer, on every tool. */
+.tool__disclaimer {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--ink) 52%, transparent);
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  margin-top: 22px;
+}
