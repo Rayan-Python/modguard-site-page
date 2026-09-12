@@ -1,12 +1,13 @@
 import Seo from '../components/Seo.jsx'
-import { RELEASE_TAG } from '../data/release.js'
+import { RELEASE_VERSION_LABEL } from '../data/release.js'
 
 // Newest release first. Add new entries at the top of this array as they ship.
-// The current entry's version comes from src/data/release.js so the changelog,
-// the download link and the packaged app can never disagree.
+// The current entry's version comes from src/data/release.js so the changelog
+// and the packaged app can never disagree. This is APP_VERSION, not the GitHub
+// release tag the download link uses — the two are independent (see release.js).
 const entries = [
   {
-    version: RELEASE_TAG,
+    version: RELEASE_VERSION_LABEL,
     date: null,
     current: true,
     changes: [
