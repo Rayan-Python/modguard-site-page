@@ -11,8 +11,7 @@ import Version from './pages/Version.jsx'
 import Terms from './pages/Terms.jsx'
 import Security from './pages/Security.jsx'
 import WhyFree from './pages/WhyFree.jsx'
-// Team import removed temporarily — /team route is rolled back below while
-// the page is reworked. Component is untouched.
+import Team from './pages/Team.jsx'
 import Contact from './pages/Contact.jsx'
 import NotFound from './pages/NotFound.jsx'
 import InternalStats from './pages/InternalStats.jsx'
@@ -33,6 +32,7 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/security" element={<Security />} />
           <Route path="/free" element={<WhyFree />} />
+          <Route path="/team" element={<Team />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/internal-stats" element={<InternalStats />} />
           <Route path="*" element={<NotFound />} />
