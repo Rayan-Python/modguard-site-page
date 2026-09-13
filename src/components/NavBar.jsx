@@ -5,7 +5,7 @@ const links = [
   { to: '/how-it-works', label: 'How it works' },
   { to: '/detection', label: 'Detection' },
   { to: '/security-tools', label: 'Tools' },
-  { to: '/team', label: 'Team' },
+  // Temporarily unlinked while /team is rolled back — see App.jsx.
   { to: '/version', label: 'Version' },
   { to: '/privacy', label: 'Privacy' },
   { to: '/terms', label: 'Terms' },
