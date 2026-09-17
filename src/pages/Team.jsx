@@ -1,31 +1,11 @@
 import Seo from '../components/Seo.jsx'
 
 const members = [
-  {
-    name: 'Ryan Norouzi',
-    school: 'Bergen County Technical High School, Teterboro',
-    role: 'Chief Executive Officer',
-  },
-  {
-    name: 'Ryan Soudkhah',
-    school: 'Northern Highlands Regional High School',
-    role: 'Chief Technology Officer',
-  },
-  {
-    name: 'Darren Kapturski',
-    school: 'Bergen County Technical High School, Teterboro',
-    role: 'Chief Business Development Officer',
-  },
-  {
-    name: 'Edward Chang',
-    school: 'Bergen County Technical High School, Teterboro',
-    role: 'Head of Research & Analysis',
-  },
-  {
-    name: 'Geffen Alon',
-    school: 'Bergen County Technical High School, Teterboro',
-    role: 'Business Operations',
-  },
+  { name: 'Ryan Norouzi' },
+  { name: 'Ryan Soudkhah' },
+  { name: 'Darren Kapturski' },
+  { name: 'Edward Chang' },
+  { name: 'Geffen Alon' },
 ]
 
 function initials(name) {
@@ -55,8 +35,7 @@ export default function Team() {
                 {initials(member.name)}
               </span>
               <p className="team-card__name">{member.name}</p>
-              <p className="team-card__role">{member.role}</p>
-              <p className="team-card__meta">{member.school}</p>
+              <p className="team-card__role">Co-founder</p>
             </li>
           ))}
         </ul>

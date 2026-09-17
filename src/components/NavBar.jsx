@@ -6,7 +6,6 @@ const links = [
   { to: '/detection', label: 'Detection' },
   { to: '/security-tools', label: 'Tools' },
   { to: '/team', label: 'Team' },
-  { to: '/version', label: 'Version' },
   { to: '/privacy', label: 'Privacy' },
   { to: '/terms', label: 'Terms' },
   { to: '/contact', label: 'Contact' },

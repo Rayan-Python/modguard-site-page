@@ -7,15 +7,15 @@ import Home from './pages/Home.jsx'
 import Privacy from './pages/Privacy.jsx'
 import HowItWorks from './pages/HowItWorks.jsx'
 import Detection from './pages/Detection.jsx'
-import Version from './pages/Version.jsx'
 import Terms from './pages/Terms.jsx'
 import Security from './pages/Security.jsx'
 import WhyFree from './pages/WhyFree.jsx'
 import Team from './pages/Team.jsx'
 import Contact from './pages/Contact.jsx'
 import NotFound from './pages/NotFound.jsx'
-import InternalStats from './pages/InternalStats.jsx'
 import SecurityTools from './pages/SecurityTools.jsx'
+// Version and InternalStats pages are unwired now that ModGuard is web-only —
+// both tracked the desktop app's GitHub releases. Components are untouched.
 
 export default function App() {
   return (
@@ -28,13 +28,11 @@ export default function App() {
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/detection" element={<Detection />} />
           <Route path="/security-tools" element={<SecurityTools />} />
-          <Route path="/version" element={<Version />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/security" element={<Security />} />
           <Route path="/free" element={<WhyFree />} />
           <Route path="/team" element={<Team />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/internal-stats" element={<InternalStats />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

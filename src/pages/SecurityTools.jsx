@@ -127,13 +127,12 @@ function NativeScanner() {
     <section className="tool">
       <h2 className="tool__heading">Native mod scanner</h2>
       <p className="tool__lede">
-        For the games the desktop app does not reach: Red Dead Redemption 2, Cyberpunk 2077,
-        Watch Dogs, Assassin's Creed and the Bethesda titles. Upload a <code>.dll</code>,{' '}
-        <code>.asi</code>, <code>.exe</code> or the archive you downloaded, and ModGuard
-        reads the Windows headers, the strings and any nested archives for the injection,
-        credential-theft and persistence patterns that mod menus and fake trainers are built
-        from. Minecraft and Java mods are the desktop app's job — this is the native side it
-        does not reach. Nothing leaves your browser.
+        For open-world and adventure games outside Minecraft: Red Dead Redemption 2,
+        Cyberpunk 2077, Watch Dogs, Assassin's Creed and the Bethesda titles. Upload a{' '}
+        <code>.dll</code>, <code>.asi</code>, <code>.exe</code> or the archive you
+        downloaded, and ModGuard reads the Windows headers, the strings and any nested
+        archives for the injection, credential-theft and persistence patterns that mod
+        menus and fake trainers are built from. Nothing leaves your browser.
       </p>
 
       <div className="tool__row">
@@ -204,24 +203,13 @@ export default function SecurityTools() {
       <div className="container doc__inner">
         <h1 className="doc__title">Security tools</h1>
         <p className="doc__lede">
-          Two checks you can run right here, for the things the desktop app does not cover:
-          native mod files for games outside Minecraft, and the link you were about to
-          follow. Neither replaces the app, and neither file ever leaves your browser.
+          Two checks you can run right here: native mod files for games outside Minecraft,
+          and the link you were about to follow. Nothing ever leaves your browser.
         </p>
 
         <div className="tools">
           <NativeScanner />
           <UrlChecker />
-        </div>
-
-        <div className="tools__cta">
-          <p className="tools__cta-text">
-            Want the full picture? Download ModGuard for real-time protection, reputation
-            verification, and detailed threat analysis.
-          </p>
-          <a className="tools__cta-link" href="/#download">
-            Download ModGuard
-          </a>
         </div>
       </div>
     </section>
