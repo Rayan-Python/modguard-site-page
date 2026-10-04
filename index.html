@@ -2,39 +2,79 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ModGuard: Original Co-Founding Team</title>
+    <meta name="description" content="ModGuard was built by five co-founders over the summer. The project is now active at modguardprotection.com." />
+    <meta name="theme-color" content="#000000" />
     <link rel="icon" type="image/png" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="ModGuard is a free malware scanner for Minecraft mods and other game files. Scan before you install, for any game, not just one."
-    />
-    <meta name="theme-color" content="#0d0d0d" />
-    <link rel="canonical" href="https://modguardian.com/" />
-    <title>ModGuard: Minecraft Mod Scanner &amp; Game File Malware Checker</title>
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="ModGuard" />
-    <meta property="og:title" content="ModGuard" />
-    <meta
-      property="og:description"
-      content="Scan mods and game files for malware before you install them."
-    />
-    <meta property="og:image" content="https://modguardian.com/og-image.png" />
-    <meta property="og:url" content="https://modguardian.com/" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="ModGuard" />
-    <meta
-      name="twitter:description"
-      content="Scan mods and game files for malware before you install them."
-    />
-    <meta name="twitter:image" content="https://modguardian.com/og-image.png" />
+    <style>
+      :root { --bg:#000; --ink:#ececec; --muted:#8e9196; --rule:#26282b; --accent:#c9d1d9; }
+      * { box-sizing:border-box; }
+      body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.65 "Helvetica Neue",Helvetica,Arial,sans-serif; }
+      a { color:inherit; }
+      .wrap { max-width:1040px; margin:0 auto; padding:0 24px; }
+      header { border-bottom:1px solid var(--rule); padding:18px 0; }
+      header .wrap { display:flex; align-items:center; gap:12px; }
+      header img { width:36px; height:36px; object-fit:contain; }
+      header span { font-weight:700; letter-spacing:.04em; }
+      .hero { display:grid; grid-template-columns:1.4fr 1fr; gap:56px; align-items:center; padding:72px 0; border-bottom:1px solid var(--rule); }
+      h1 { font:400 clamp(2rem,4.4vw,3.2rem)/1.12 Georgia,"Times New Roman",serif; margin:0 0 20px; }
+      .hero p { color:var(--muted); max-width:520px; margin:0 0 28px; }
+      .cta { display:inline-block; background:var(--accent); color:#000; font-weight:700; text-decoration:none; padding:13px 24px; border-radius:4px; }
+      .cta:hover { background:#fff; }
+      .hero img { width:100%; max-width:340px; justify-self:end; display:block; }
+      .team { display:grid; grid-template-columns:1fr 2fr; gap:56px; padding:64px 0; }
+      h2 { font:400 1.6rem/1.2 Georgia,"Times New Roman",serif; margin:0 0 12px; }
+      .team p { color:var(--muted); margin:0; }
+      ol { list-style:none; margin:0; padding:0; counter-reset:n; }
+      li { counter-increment:n; display:flex; justify-content:space-between; align-items:baseline; padding:16px 0; border-top:1px solid var(--rule); }
+      li:last-child { border-bottom:1px solid var(--rule); }
+      li::before { content:counter(n,decimal-leading-zero); color:var(--muted); font-size:.85rem; width:48px; }
+      li b { flex:1; font-weight:600; font-size:1.1rem; }
+      li small { color:var(--muted); font-size:.9rem; }
+      footer { border-top:1px solid var(--rule); padding:24px 0 40px; color:var(--muted); font-size:.9rem; }
+      @media (max-width:760px) {
+        .hero,.team { grid-template-columns:1fr; gap:32px; padding:48px 0; }
+        .hero img { justify-self:start; max-width:200px; order:-1; }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <header>
+      <div class="wrap"><img src="/logo.png" alt="" /><span>MODGUARD</span></div>
+    </header>
+
+    <main class="wrap">
+      <section class="hero">
+        <div>
+          <h1>Built by five of us over one summer.</h1>
+          <p>
+            ModGuard started as a malware scanner for game mods, designed and built by its five
+            co-founders. The project is now active at its new home, with Ryan Norouzi and Edward Chang still active on the team.
+          </p>
+          <a class="cta" href="https://modguardprotection.com">Go to modguardprotection.com &rarr;</a>
+        </div>
+        <img src="/logo.png" alt="ModGuard logo" />
+      </section>
+
+      <section class="team">
+        <div>
+          <h2>Original co-founding team</h2>
+          <p>The people behind the early work and build of ModGuard.</p>
+        </div>
+        <ol>
+          <li><b>Ryan Norouzi</b><small>Co-founder · Active</small></li>
+          <li><b>Ryan Soudkhah</b><small>Co-founder</small></li>
+          <li><b>Darren Kapturski</b><small>Co-founder</small></li>
+          <li><b>Edward Chang</b><small>Co-founder · Active</small></li>
+          <li><b>Geffen Alon</b><small>Co-founder</small></li>
+        </ol>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">Looking for the scanner? Visit <a href="https://modguardprotection.com">modguardprotection.com</a>.</div>
+    </footer>
   </body>
 </html>
